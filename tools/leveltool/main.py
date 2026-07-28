@@ -23,7 +23,7 @@ from rules import DIRECTIONS, Level, initial_state, is_won, play, validate_level
 from solver import analyse
 
 ROOT = Path(__file__).resolve().parents[2]
-LEVEL_DIR = ROOT / "Assets" / "Content" / "Levels"
+LEVEL_DIR = ROOT / "Assets" / "Resources" / "Levels"
 BAND = 6.0  # allowed |MDS - target| for a shipped level
 
 ARROWS = {"up": "^", "down": "v", "left": "<", "right": ">"}

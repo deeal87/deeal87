@@ -1,0 +1,19 @@
+{
+  "name": "SunnyStop.Tests",
+  "rootNamespace": "SunnyStop.Tests",
+  "references": [
+    "SunnyStop.Core",
+    "SunnyStop.Game",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

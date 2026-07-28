@@ -29,7 +29,7 @@ from rules import (
 )
 from solver import analyse
 
-LEVEL_DIR = Path(__file__).resolve().parents[2] / "Assets" / "Content" / "Levels"
+LEVEL_DIR = Path(__file__).resolve().parents[2] / "Assets" / "Resources" / "Levels"
 BAND = 6.0
 
 

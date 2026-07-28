@@ -1,0 +1,14 @@
+{
+  "name": "SunnyStop.Game",
+  "rootNamespace": "SunnyStop.Game",
+  "references": ["SunnyStop.Core"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
