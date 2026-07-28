@@ -115,14 +115,14 @@ the rule without also fighting the difficulty, then combined with everything bef
 |---|---|---|
 | 1–8 | Tutorial: tap, dock, board, fill | — |
 | 9–20 | 4th colour, queue peek (see next 8) | Basic planning |
-| 21–35 | **Cones & barriers** — permanently blocked cells | Pure spatial pressure |
+| 21–35 | **Cones & barriers**, and **surplus buses** — extra buses nobody needs | Spatial pressure, and the first mistakes that stay hidden |
 | 36–50 | **Luggage passengers** — take 2 seats | Breaks the "capacity 3 = 3 people" arithmetic |
-| 51–65 | **One-way arrows** on lanes | Forces routing order |
+| 51–65 | **One-way arrows** on lanes | Variety and readability only — measured to add no difficulty, since buses drive straight and never have an alternative route |
 | 66–80 | **Locked buses** — open with tickets earned by boarding | Resource sub-goal |
 | 81–95 | **Garage buses** — colour hidden until adjacent bus leaves | Managed risk / probability |
 | 96–110 | **Double-deckers** — capacity 6, occupy 1×3 | Bay commitment becomes expensive |
 | 111–125 | **Traffic lights** — toggle a lane open/closed every N moves | Timing layer |
-| 126–140 | **Only 2 bays** | Hardest single knob in the game |
+| 126–140 | **Only 2 bays** | A change of feel: tight and tense. Measured *easier* than 3 bays, so the surrounding parameters compensate (see findings §5) |
 | 141–155 | **VIP passengers** — must board within N moves | Soft urgency, no real-time timer |
 | 156–170 | **Tunnels** — bus exits one side, re-enters another | Spatial re-think |
 | 171–190 | Full combination, "expert dispatch" boards | Mastery |
@@ -188,24 +188,61 @@ JSON** and shipped with the app — no runtime generation, so every player world
 the identical, verified level, and walkthrough sites/YouTube (a major organic traffic
 source for this genre) actually work.
 
+### 5.2b Why surplus buses exist
+
+The single most important thing measurement changed about this design.
+
+With seats exactly matching passengers, every bus eventually fills and every bay
+eventually frees, so the only way to lose is instant gridlock — which the player
+sees the moment it happens. That makes the game *punishing* but not *hard*: a
+mistake can never stay hidden.
+
+Levels therefore carry **surplus buses** the solution does not need, parked off
+every intended route so solvability by construction is untouched. Send one into a
+bay and it can sit there forever, costing a bay silently while play continues.
+That is what lets a mistake take ten moves to surface, and it is the mechanic
+that moved difficulty when luggage and double-deckers did not.
+
+It also makes the instant rewind offer (§5.4) load-bearing rather than a nicety:
+deep deception is only fair if the game tells you the moment it happens.
+
 ### 5.3 The target curve
 
 ```
-Target(n) = 5 + 85 · (n / 200)^0.80          # smooth rise, 5 → 90
-          − 12  if n mod 10 == 0             # breather level, a guaranteed win
-          + 8   if n mod 25 == 0             # milestone spike
-          ± 3   deterministic noise           # texture, so it never feels metronomic
-Clamped to [4, 92].
+Target(n) = 4 + 68 · (n / 200)^1.15          # gentle opening, steady rise
+          × 1.18  if n mod 25 == 0           # milestone spike
+          × 0.58  else if n mod 10 == 0      # breather - never on a milestone
+          × (1 ± 0.07)                       # texture, so it never feels metronomic
+Clamped to [3, 72].
 ```
 
-| Level | ~MDS | Feels like |
-|---|---|---|
-| 1 | 5 | "Oh, I get it" |
-| 25 | 24 | Two colours to think about |
-| 50 | 33 | First real pause before tapping |
-| 100 | 54 | Needs a plan, one restart is normal |
-| 150 | 71 | 2–4 attempts, satisfying to crack |
-| 200 | 90 | 10+ minutes, screenshot-worthy |
+Three details that only became obvious once it was measured:
+
+- **The exponent is above 1.** The first draft used 0.80, which rises fastest at
+  the very start and wanted MDS 13 by level 10 — from an opening chapter whose
+  whole job is to be unfailable.
+- **The breather never lands on a milestone.** Levels 50, 100, 150 and 200 are
+  multiples of both 10 and 25; applying both modifiers made the flagship levels
+  *easier* than their neighbours.
+- **The ceiling is 72, not 100.** That is the hardest the current ruleset can
+  actually produce. Aiming past it yields permanent drift on the last dozen
+  levels rather than harder levels.
+
+Measured on the shipped ladder (mean per chapter):
+
+| Chapter | Levels | MDS | Solution density | Deepest hidden mistake |
+|---|---|---|---|---|
+| 1 | 1–25 | 5.5 | 0.90 | 1 move |
+| 2 | 26–50 | 13.2 | 0.73 | 2 moves |
+| 3 | 51–75 | 21.6 | 0.61 | 5 moves |
+| 4 | 76–100 | 30.0 | 0.54 | 9 moves |
+| 5 | 101–125 | 38.3 | 0.47 | 10 moves |
+| 6 | 126–150 | 47.4 | 0.34 | 11 moves |
+| 7 | 151–175 | 55.6 | 0.28 | 11 moves |
+| 8 | 176–200 | 62.7 | 0.24 | 13 moves |
+
+Difficulty rises on both measures that matter to a player: levels get steadily
+less forgiving, and a wrong move takes steadily longer to reveal itself.
 
 Deliberate design choices in that curve:
 - **The sawtooth is the point.** A pure monotonic ramp reads as a grind. The every-10th

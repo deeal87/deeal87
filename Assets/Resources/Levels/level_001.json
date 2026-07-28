@@ -17,31 +17,31 @@
       "color": "red",
       "cells": [
         [
-          4,
-          2
-        ],
-        [
-          4,
-          3
-        ]
-      ],
-      "facing": "down",
-      "capacity": 3
-    },
-    {
-      "id": 2,
-      "color": "red",
-      "cells": [
-        [
-          1,
+          0,
           0
         ],
         [
-          2,
+          1,
           0
         ]
       ],
       "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 2,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "facing": "down",
       "capacity": 3
     },
     {
@@ -49,15 +49,15 @@
       "color": "blue",
       "cells": [
         [
-          0,
-          4
+          2,
+          3
         ],
         [
-          1,
+          2,
           4
         ]
       ],
-      "facing": "right",
+      "facing": "up",
       "capacity": 3
     }
   ],
@@ -67,7 +67,13 @@
       "color": "red"
     },
     {
-      "color": "red"
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "red"
@@ -82,13 +88,7 @@
       "color": "blue"
     },
     {
-      "color": "red"
-    },
-    {
       "color": "blue"
-    },
-    {
-      "color": "red"
     }
   ],
   "analysis": {
@@ -97,9 +97,11 @@
     "solutionDensity": 1.0,
     "trapDepth": 4,
     "forcedRatio": 0.5,
+    "deception": 0.0,
+    "deceptionMax": 0,
     "deadEnds": 0,
-    "raw": 0.277,
-    "mds": 3.9
+    "raw": 0.178,
+    "mds": 2.1
   },
   "solution": [
     1,

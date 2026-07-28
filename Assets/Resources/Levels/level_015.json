@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "id": 15,
+  "chapter": 1,
+  "grid": {
+    "w": 5,
+    "h": 5
+  },
+  "bays": 3,
+  "colors": [
+    "red",
+    "blue"
+  ],
+  "buses": [
+    {
+      "id": 1,
+      "color": "red",
+      "cells": [
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ]
+      ],
+      "facing": "left",
+      "capacity": 3
+    },
+    {
+      "id": 2,
+      "color": "red",
+      "cells": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "facing": "left",
+      "capacity": 3
+    },
+    {
+      "id": 3,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 4,
+      "color": "red",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "facing": "left",
+      "capacity": 3
+    }
+  ],
+  "blocked": [],
+  "queue": [
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    }
+  ],
+  "analysis": {
+    "optimal": 4,
+    "states": 27,
+    "solutionDensity": 0.85,
+    "trapDepth": 3,
+    "forcedRatio": 0.15,
+    "deception": 0.0,
+    "deceptionMax": 0,
+    "deadEnds": 6,
+    "raw": 0.5962,
+    "mds": 6.6
+  },
+  "solution": [
+    1,
+    2,
+    3,
+    4
+  ]
+}

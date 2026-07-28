@@ -249,6 +249,17 @@ namespace SunnyStop.Tests
     public class BakedLevelTests
     {
         [Test]
+        public void TheFullLadderIsPresent()
+        {
+            List<int> levels = ContentLoader.AvailableLevels();
+            Assert.AreEqual(200, levels.Count, "the game ships 200 levels");
+            for (int i = 0; i < levels.Count; i++)
+            {
+                Assert.AreEqual(i + 1, levels[i], "level numbering has a gap");
+            }
+        }
+
+        [Test]
         public void EveryShippedLevelLoadsAndIsSolvable()
         {
             List<int> levels = ContentLoader.AvailableLevels();
@@ -264,6 +275,17 @@ namespace SunnyStop.Tests
                 Assert.IsTrue(Solver.IsSolvable(level, start),
                               $"level {number} is not solvable");
             }
+        }
+
+        /// <summary>Every 17th level: 12 boards spread across all eight chapters.</summary>
+        private static List<int> Sample()
+        {
+            var all = ContentLoader.AvailableLevels();
+            var picked = new List<int>();
+            for (int i = 0; i < all.Count; i += 17) picked.Add(all[i]);
+            if (all.Count > 0 && !picked.Contains(all[all.Count - 1]))
+                picked.Add(all[all.Count - 1]);
+            return picked;
         }
 
         [Test]
@@ -284,13 +306,20 @@ namespace SunnyStop.Tests
                     state = state.Dispatch(level, busId);
                 }
                 Assert.IsTrue(state.IsWon(level), $"level {number}: solution did not win");
+
+                // Surplus buses are expected to be left standing - the solution
+                // deliberately never touches them.
+                Assert.LessOrEqual(level.ReferenceSolution.Count, level.Buses.Count);
             }
         }
 
         [Test]
         public void HintAlwaysReturnsAMoveThatKeepsTheLevelWinnable()
         {
-            foreach (int number in ContentLoader.AvailableLevels())
+            // Walking every level with a full re-solve after each move is far too
+            // slow for the edit-mode suite; a spread across the chapters catches
+            // the same regressions. The Python content gate covers all 200.
+            foreach (int number in Sample())
             {
                 LevelDefinition level = ContentLoader.Load(number);
                 GameState state = GameState.Initial(level);

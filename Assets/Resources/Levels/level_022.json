@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "id": 22,
+  "chapter": 1,
+  "grid": {
+    "w": 5,
+    "h": 6
+  },
+  "bays": 3,
+  "colors": [
+    "red",
+    "blue"
+  ],
+  "buses": [
+    {
+      "id": 1,
+      "color": "red",
+      "cells": [
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 2,
+      "color": "red",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 3,
+      "color": "blue",
+      "cells": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 4,
+      "color": "red",
+      "cells": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 5,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    }
+  ],
+  "blocked": [
+    [
+      0,
+      2
+    ]
+  ],
+  "queue": [
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    }
+  ],
+  "analysis": {
+    "optimal": 4,
+    "states": 65,
+    "solutionDensity": 0.8182,
+    "trapDepth": 3,
+    "forcedRatio": 0.0,
+    "deception": 0.0,
+    "deceptionMax": 0,
+    "deadEnds": 18,
+    "raw": 0.7473,
+    "mds": 9.8
+  },
+  "solution": [
+    1,
+    2,
+    3,
+    5
+  ]
+}

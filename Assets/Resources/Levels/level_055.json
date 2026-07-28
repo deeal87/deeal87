@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "id": 55,
+  "chapter": 3,
+  "grid": {
+    "w": 6,
+    "h": 6
+  },
+  "bays": 3,
+  "colors": [
+    "green",
+    "red",
+    "blue"
+  ],
+  "buses": [
+    {
+      "id": 1,
+      "color": "green",
+      "cells": [
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "facing": "left",
+      "capacity": 3
+    },
+    {
+      "id": 2,
+      "color": "green",
+      "cells": [
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "facing": "left",
+      "capacity": 3
+    },
+    {
+      "id": 3,
+      "color": "red",
+      "cells": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 4,
+      "color": "blue",
+      "cells": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "facing": "left",
+      "capacity": 3
+    },
+    {
+      "id": 5,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 6,
+      "color": "red",
+      "cells": [
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 7,
+      "color": "blue",
+      "cells": [
+        [
+          5,
+          2
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "facing": "down",
+      "capacity": 3
+    }
+  ],
+  "blocked": [
+    [
+      0,
+      5
+    ],
+    [
+      4,
+      3
+    ]
+  ],
+  "queue": [
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    }
+  ],
+  "analysis": {
+    "optimal": 6,
+    "states": 539,
+    "solutionDensity": 0.6579,
+    "trapDepth": 2,
+    "forcedRatio": 0.0,
+    "deception": 0.156,
+    "deceptionMax": 1,
+    "deadEnds": 282,
+    "raw": 1.0493,
+    "mds": 20.4
+  },
+  "solution": [
+    1,
+    3,
+    4,
+    2,
+    5,
+    6
+  ]
+}

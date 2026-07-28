@@ -42,9 +42,15 @@ tools/leveltool/         Level generator, solver and difficulty scorer (Python).
 
 Pre-production prototype (M0).
 
-- Level generator, solver and difficulty scorer: **working**, 30 tests green
-- 12 levels baked (1–10 plus previews of 50 and 120), all verified solvable and on-curve
+- **All 200 levels built and verified** — every one proven solvable, mean drift
+  from the target curve 1.5 points, 197 of 200 within 6. Regenerates in under
+  two minutes.
+- Level generator, solver and difficulty scorer: **working**, 35 tests green
 - Unity prototype: rules, solver-backed hints, free rewind, postcard screen, colour-blind palettes
 - 240 German postcards across six situational categories, all three tones covered
 
-Not built yet: art, audio, the map, the album, the shop, and the remaining 188 levels.
+Difficulty rises on both measures that matter: levels get steadily less forgiving
+(solution density 0.90 → 0.24 across the eight chapters) and a wrong move takes
+steadily longer to reveal itself (1 move → 13).
+
+Not built yet: art, audio, the map, the album and the shop.

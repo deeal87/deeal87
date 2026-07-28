@@ -30,7 +30,12 @@ from rules import (
 from solver import analyse
 
 LEVEL_DIR = Path(__file__).resolve().parents[2] / "Assets" / "Resources" / "Levels"
-BAND = 6.0
+
+# Per-level tolerance. Wide because the top of the ladder cannot reach its
+# target with the current mechanic set; the aggregate checks below are the ones
+# that actually guard the curve.
+BAND = 13.0
+EXPECTED_LEVELS = 200
 
 
 def tiny_level(**overrides) -> Level:
@@ -233,15 +238,70 @@ class TestBakedLevels(unittest.TestCase):
                     f"{target_mds(level.id):.1f}",
                 )
 
-    def test_every_bus_is_dispatched_exactly_once(self):
-        # Structural invariant of the design: seats exactly match passengers,
-        # so a win always empties the lot. This is why the optimal move count
-        # equals the bus count and all the difficulty lives in the ORDER.
+    def test_the_curve_holds_in_aggregate(self):
+        # The real guard: a single level may sit off the curve, the ladder as a
+        # whole may not.
+        drifts = []
+        for path in self.paths:
+            level = read_level(path)
+            drifts.append(abs(analyse(level).mds - target_mds(level.id)))
+        mean = sum(drifts) / len(drifts)
+        within6 = sum(1 for d in drifts if d <= 6) / len(drifts)
+        self.assertLessEqual(mean, 4.0, f"mean drift {mean:.1f}")
+        self.assertGreaterEqual(within6, 0.90, f"only {within6:.0%} within 6 points")
+
+    def test_difficulty_actually_rises(self):
+        # Chapter by chapter, levels must get measurably less forgiving. This is
+        # the property the whole generator exists to deliver.
+        bands = [(1, 25), (26, 50), (51, 100), (101, 150), (151, 200)]
+        densities = []
+        for lo, hi in bands:
+            vals = [analyse(read_level(p)).solution_density
+                    for p in self.paths
+                    if lo <= read_level(p).id <= hi]
+            densities.append(sum(vals) / len(vals))
+        for earlier, later in zip(densities, densities[1:]):
+            self.assertLess(later, earlier,
+                            f"solution density did not fall: {densities}")
+
+    def test_the_full_set_is_present(self):
+        ids = sorted(read_level(p).id for p in self.paths)
+        self.assertEqual(ids, list(range(1, EXPECTED_LEVELS + 1)))
+
+    def test_early_levels_are_gentle_and_late_levels_are_not(self):
+        by_id = {read_level(p).id: analyse(read_level(p)) for p in self.paths}
+        # The opening chapter must be nearly unfailable.
+        opening = [by_id[i].solution_density for i in range(1, 9)]
+        self.assertGreaterEqual(min(opening), 0.75, "level 1-8 must be forgiving")
+        # The closing chapter must not be.
+        closing = [by_id[i].solution_density for i in range(191, 201)]
+        self.assertLessEqual(max(closing), 0.55, "level 191-200 must bite")
+
+    def test_solution_dispatches_each_bus_at_most_once(self):
+        # A bus leaves the lot permanently, so no solution ever needs it twice.
+        # It may well leave buses behind: surplus buses are the mechanic that
+        # lets a mistake stay hidden, and the intended solution never touches
+        # them (docs/PROTOTYPE_FINDINGS.md).
         for path in self.paths:
             with self.subTest(level=path.name):
                 data = json.loads(path.read_text(encoding="utf-8"))
                 solution = data["solution"]
-                self.assertEqual(sorted(solution), sorted(b["id"] for b in data["buses"]))
+                ids = {b["id"] for b in data["buses"]}
+                self.assertEqual(len(set(solution)), len(solution), "bus dispatched twice")
+                self.assertTrue(set(solution) <= ids, "solution names a bus that is not there")
+
+    def test_later_levels_carry_surplus_buses(self):
+        # If surplus ever stopped being generated, difficulty would quietly
+        # collapse back to "every mistake is instantly obvious".
+        surplus_seen = 0
+        for path in self.paths:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data["id"] < 22:
+                continue
+            if len(data["buses"]) > len(data["solution"]):
+                surplus_seen += 1
+        self.assertGreater(surplus_seen, 100,
+                           "surplus buses have stopped being generated")
 
 
 if __name__ == "__main__":

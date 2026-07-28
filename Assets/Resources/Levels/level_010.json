@@ -8,68 +8,68 @@
   },
   "bays": 3,
   "colors": [
-    "red",
-    "blue"
+    "blue",
+    "red"
   ],
   "buses": [
     {
       "id": 1,
-      "color": "red",
+      "color": "blue",
       "cells": [
         [
-          0,
-          3
+          2,
+          1
         ],
         [
-          1,
-          3
+          2,
+          2
         ]
       ],
-      "facing": "right",
+      "facing": "down",
       "capacity": 3
     },
     {
       "id": 2,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          2,
+          4,
           1
         ],
         [
-          3,
-          1
+          4,
+          2
         ]
       ],
-      "facing": "right",
+      "facing": "down",
       "capacity": 3
     },
     {
       "id": 3,
-      "color": "red",
+      "color": "blue",
       "cells": [
         [
-          2,
+          1,
           0
         ],
         [
-          3,
-          0
+          1,
+          1
         ]
       ],
-      "facing": "left",
+      "facing": "down",
       "capacity": 3
     },
     {
       "id": 4,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          0,
+          2,
           4
         ],
         [
-          1,
+          3,
           4
         ]
       ],
@@ -83,12 +83,6 @@
       "color": "red"
     },
     {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
       "color": "blue"
     },
     {
@@ -96,9 +90,6 @@
     },
     {
       "color": "red"
-    },
-    {
-      "color": "blue"
     },
     {
       "color": "red"
@@ -111,6 +102,15 @@
     },
     {
       "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "red"
@@ -118,18 +118,20 @@
   ],
   "analysis": {
     "optimal": 4,
-    "states": 26,
+    "states": 18,
     "solutionDensity": 1.0,
     "trapDepth": 5,
-    "forcedRatio": 0.48,
+    "forcedRatio": 0.5294,
+    "deception": 0.0,
+    "deceptionMax": 0,
     "deadEnds": 0,
-    "raw": 0.3969,
-    "mds": 5.2
+    "raw": 0.2148,
+    "mds": 2.3
   },
   "solution": [
-    1,
     2,
     3,
-    4
+    4,
+    1
   ]
 }

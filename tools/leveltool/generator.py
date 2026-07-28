@@ -29,25 +29,30 @@ from curve import PALETTE, GenParams, params_for, target_mds
 from rules import Bus, DIRECTIONS, Level, Passenger, validate_level
 from solver import Analysis, analyse
 
-CAPACITY = 3
-BUS_LENGTH = 2
+SMALL_CAPACITY = 3
+SMALL_LENGTH = 2
+DECKER_CAPACITY = 6
+DECKER_LENGTH = 3
 
 
 class GenerationFailure(Exception):
     pass
 
 
-def _build_schedule(rng: random.Random, n_buses: int, bays: int, n_colors: int):
-    """Return (dispatch_colors, queue_colors).
+def _build_schedule(rng: random.Random, p: GenParams):
+    """Return (dispatch, queue).
+
+    `dispatch` is a list of (colour, capacity) in the order the buses leave the
+    lot; `queue` is a list of (colour, luggage) in boarding order.
 
     Keeps at most one docked bus per colour so the "leftmost matching bay" rule
     is never ambiguous in the intended solution.
     """
-    palette = PALETTE[:n_colors]
-    dispatch: list[str] = []
-    queue: list[str] = []
-    docked: list[list] = []  # [color, remaining]
-    left = n_buses
+    palette = PALETTE[: p.colors]
+    dispatch: list[tuple[str, int]] = []
+    queue: list[tuple[str, bool]] = []
+    docked: list[list] = []  # [colour, remaining]
+    left = p.buses
     # Guarantee every colour is used at least once, then go random.
     pending_colors = list(palette)
     rng.shuffle(pending_colors)
@@ -60,7 +65,7 @@ def _build_schedule(rng: random.Random, n_buses: int, bays: int, n_colors: int):
 
         docked_colors = {d[0] for d in docked}
         available = [c for c in palette if c not in docked_colors]
-        can_dispatch = left > 0 and len(docked) < bays and bool(available)
+        can_dispatch = left > 0 and len(docked) < p.bays and bool(available)
         can_board = bool(docked)
 
         if can_dispatch and (not can_board or rng.random() < 0.55):
@@ -72,13 +77,21 @@ def _build_schedule(rng: random.Random, n_buses: int, bays: int, n_colors: int):
                     choice = rng.choice(available)
             else:
                 choice = rng.choice(available)
-            dispatch.append(choice)
-            docked.append([choice, CAPACITY])
+            capacity = (
+                DECKER_CAPACITY if rng.random() < p.decker_chance else SMALL_CAPACITY
+            )
+            dispatch.append((choice, capacity))
+            docked.append([choice, capacity])
             left -= 1
         elif can_board:
             d = rng.choice(docked)
-            queue.append(d[0])
-            d[1] -= 1
+            # A luggage passenger takes two seats, so it only fits while the bus
+            # still has room for two. That is the whole point of the mechanic:
+            # a bus with one seat left can no longer take one.
+            luggage = d[1] >= 2 and rng.random() < p.luggage_chance
+            seats = 2 if luggage else 1
+            queue.append((d[0], luggage))
+            d[1] -= seats
             if d[1] == 0:
                 docked.remove(d)
         else:  # pragma: no cover - defensive
@@ -89,16 +102,16 @@ def _build_schedule(rng: random.Random, n_buses: int, bays: int, n_colors: int):
     return dispatch, queue
 
 
-def _placements(width: int, height: int):
-    """All (cells, facing) options for a straight bus of BUS_LENGTH."""
+def _placements(width: int, height: int, length: int):
+    """All (cells, facing) options for a straight bus of the given length."""
     out = []
     for facing, (dx, dy) in DIRECTIONS.items():
         for x in range(width):
             for y in range(height):
                 if dx != 0:
-                    cells = tuple((x + i, y) for i in range(BUS_LENGTH))
+                    cells = tuple((x + i, y) for i in range(length))
                 else:
-                    cells = tuple((x, y + i) for i in range(BUS_LENGTH))
+                    cells = tuple((x, y + i) for i in range(length))
                 if any(cx >= width or cy >= height for cx, cy in cells):
                     continue
                 out.append((cells, facing))
@@ -119,18 +132,23 @@ def _path_from(width: int, height: int, cells, facing) -> list[tuple[int, int]]:
 def _place_buses(
     rng: random.Random,
     p: GenParams,
-    dispatch: list[str],
+    dispatch: list[tuple[str, int]],
     blocked: frozenset[tuple[int, int]],
 ) -> list[Bus]:
     """Place buses in reverse dispatch order, each with a clear path at the
     moment it will be dispatched."""
-    options = _placements(p.width, p.height)
+    options = {
+        SMALL_LENGTH: _placements(p.width, p.height, SMALL_LENGTH),
+        DECKER_LENGTH: _placements(p.width, p.height, DECKER_LENGTH),
+    }
     occupied: set[tuple[int, int]] = set(blocked)
     placed: dict[int, tuple[tuple, str]] = {}
 
     for i in range(len(dispatch) - 1, -1, -1):
+        _color, capacity = dispatch[i]
+        length = DECKER_LENGTH if capacity == DECKER_CAPACITY else SMALL_LENGTH
         candidates = []
-        for cells, facing in options:
+        for cells, facing in options[length]:
             if any(c in occupied for c in cells):
                 continue
             path = _path_from(p.width, p.height, cells, facing)
@@ -152,14 +170,89 @@ def _place_buses(
                 occupied.update(cells)
                 break
 
-    # Shuffle the ids so they do not encode the dispatch order - otherwise the
-    # baked JSON would hand out the solution to anyone who opens it.
-    ids = list(range(1, len(dispatch) + 1))
+    return placed, occupied
+
+
+def _place_decoys(
+    rng: random.Random,
+    p: GenParams,
+    dispatch: list[tuple[str, int]],
+    placed: dict[int, tuple[tuple, str]],
+    blocked: frozenset[tuple[int, int]],
+) -> list[tuple[tuple, str, str, int]]:
+    """Add surplus buses the intended solution never needs.
+
+    This is what makes a mistake take time to show up. Without surplus, every
+    bus eventually fills and every bay eventually frees, so the only way to
+    lose is instant gridlock - which the player sees immediately. A surplus bus
+    can be sent into a bay and sit there forever, costing a bay silently while
+    play continues. That is the difference between a puzzle that punishes and a
+    puzzle that is hard.
+
+    They are placed off every intended bus's route, so the reference solution
+    still works and the level stays solvable by construction.
+    """
+    if p.decoys == 0:
+        return []
+
+    forbidden = set(blocked)
+    for i, (cells, facing) in placed.items():
+        forbidden.update(cells)
+        forbidden.update(_path_from(p.width, p.height, cells, facing))
+
+    colors_in_play = sorted({c for c, _ in dispatch})
+    decoys: list[tuple[tuple, str, str, int]] = []
+    options = _placements(p.width, p.height, SMALL_LENGTH)
+
+    for _ in range(p.decoys):
+        candidates = []
+        for cells, facing in options:
+            if any(c in forbidden for c in cells):
+                continue
+            path = _path_from(p.width, p.height, cells, facing)
+            # A decoy walled in by cones can never move, which makes it scenery
+            # rather than a trap. It has to be dispatchable to be tempting.
+            if any(c in blocked for c in path):
+                continue
+            # Prefer ones that look dispatchable right now.
+            weight = 4 if not any(c in forbidden for c in path) else 1
+            candidates.append((cells, facing, weight))
+        if not candidates:
+            break
+        total = sum(c[2] for c in candidates)
+        pick = rng.random() * total
+        acc = 0.0
+        for cells, facing, weight in candidates:
+            acc += weight
+            if acc >= pick:
+                decoys.append((cells, facing, rng.choice(colors_in_play), SMALL_CAPACITY))
+                forbidden.update(cells)
+                break
+    return decoys
+
+
+def _assemble(
+    rng: random.Random,
+    dispatch: list[tuple[str, int]],
+    placed: dict[int, tuple[tuple, str]],
+    decoys: list[tuple[tuple, str, str, int]],
+) -> list[Bus]:
+    """Build the bus list with ids shuffled across intended buses AND decoys.
+
+    Shuffling matters twice over: ids must not encode the dispatch order, and a
+    decoy must not be identifiable as "the one with the high id".
+    """
+    entries = [
+        (placed[i][0], placed[i][1], dispatch[i][0], dispatch[i][1])
+        for i in range(len(dispatch))
+    ]
+    entries.extend(decoys)
+
+    ids = list(range(1, len(entries) + 1))
     rng.shuffle(ids)
     buses = [
-        Bus(id=ids[i], color=dispatch[i], cells=placed[i][0], facing=placed[i][1],
-            capacity=CAPACITY)
-        for i in range(len(dispatch))
+        Bus(id=ids[k], color=color, cells=cells, facing=facing, capacity=capacity)
+        for k, (cells, facing, color, capacity) in enumerate(entries)
     ]
     return sorted(buses, key=lambda b: b.id)
 
@@ -173,16 +266,18 @@ def _blocked_cells(rng: random.Random, p: GenParams) -> frozenset[tuple[int, int
 
 
 def generate_candidate(rng: random.Random, p: GenParams) -> Level:
-    dispatch, queue_colors = _build_schedule(rng, p.buses, p.bays, p.colors)
+    dispatch, queue = _build_schedule(rng, p)
     blocked = _blocked_cells(rng, p)
-    buses = _place_buses(rng, p, dispatch, blocked)
+    placed, _occupied = _place_buses(rng, p, dispatch, blocked)
+    decoys = _place_decoys(rng, p, dispatch, placed, blocked)
+    buses = _assemble(rng, dispatch, placed, decoys)
     level = Level(
         id=p.level,
         width=p.width,
         height=p.height,
         bays=p.bays,
         buses=tuple(buses),
-        queue=tuple(Passenger(c) for c in queue_colors),
+        queue=tuple(Passenger(color, luggage) for color, luggage in queue),
         blocked=blocked,
         chapter=p.chapter,
         move_limit=None,

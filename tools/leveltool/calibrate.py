@@ -21,7 +21,11 @@ from curve import params_for, target_mds
 from generator import GenerationFailure, generate_candidate
 from solver import analyse
 
-SAMPLE_LEVELS = [1, 5, 10, 20, 35, 50, 70, 90, 110, 130, 150, 170, 200]
+# Deliberately avoids multiples of 10 and 25. Those are breathers and
+# milestones, whose targets are modulated down or up by design - fitting the
+# HARDEST achievable board against a deliberately discounted breather target
+# drags the whole curve off.
+SAMPLE_LEVELS = [1, 6, 13, 22, 34, 47, 63, 79, 96, 113, 137, 163, 197]
 
 
 def sample_raw(n: int, samples: int, rng: random.Random) -> list[float]:

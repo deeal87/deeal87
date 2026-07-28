@@ -8,40 +8,40 @@
   },
   "bays": 3,
   "colors": [
-    "blue",
-    "red"
+    "red",
+    "blue"
   ],
   "buses": [
     {
       "id": 1,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          3,
-          0
+          2,
+          1
         ],
         [
-          4,
-          0
+          2,
+          2
         ]
       ],
-      "facing": "left",
+      "facing": "down",
       "capacity": 3
     },
     {
       "id": 2,
-      "color": "red",
+      "color": "blue",
       "cells": [
         [
-          3,
+          0,
           4
         ],
         [
-          4,
+          1,
           4
         ]
       ],
-      "facing": "left",
+      "facing": "right",
       "capacity": 3
     },
     {
@@ -50,27 +50,11 @@
       "cells": [
         [
           1,
-          1
+          2
         ],
         [
           1,
-          2
-        ]
-      ],
-      "facing": "down",
-      "capacity": 3
-    },
-    {
-      "id": 4,
-      "color": "red",
-      "cells": [
-        [
-          2,
-          1
-        ],
-        [
-          2,
-          2
+          3
         ]
       ],
       "facing": "up",
@@ -80,7 +64,16 @@
   "blocked": [],
   "queue": [
     {
-      "color": "blue"
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "red"
@@ -92,44 +85,27 @@
       "color": "blue"
     },
     {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
       "color": "blue"
     },
     {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
+      "color": "blue"
     }
   ],
   "analysis": {
-    "optimal": 4,
-    "states": 27,
-    "solutionDensity": 0.85,
-    "trapDepth": 3,
-    "forcedRatio": 0.15,
-    "deadEnds": 6,
-    "raw": 0.6997,
-    "mds": 10.6
+    "optimal": 3,
+    "states": 8,
+    "solutionDensity": 1.0,
+    "trapDepth": 4,
+    "forcedRatio": 0.4286,
+    "deception": 0.0,
+    "deceptionMax": 0,
+    "deadEnds": 0,
+    "raw": 0.2103,
+    "mds": 2.3
   },
   "solution": [
     1,
     2,
-    3,
-    4
+    3
   ]
 }

@@ -44,14 +44,13 @@ cd tools/leveltool
 python3 main.py verify              # re-solve every shipped level (the CI gate)
 python3 main.py report              # measured difficulty against the target curve
 python3 main.py show 6              # print a level as ASCII art with its solution
-python3 main.py generate --levels 11-20
-python3 -m unittest discover -p "test_*.py"   # 30 rules + content tests
+python3 main.py generate --levels 1-200   # rebuild the whole ladder (~2 min)
+python3 -m unittest discover -p "test_*.py"   # 35 rules + content tests
 ```
 
 `generate` writes to `Assets/Resources/Levels/`. It generates many candidates per
 level and keeps the one whose measured difficulty lands closest to the target
-curve, so it is slow by design — expect a minute or two per level in the higher
-ranges.
+curve. The whole 200-level ladder rebuilds in under two minutes.
 
 After changing the generator, the mechanic set, or the scoring weights, re-fit
 the scoring sigmoid:
