@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "id": 1,
+  "chapter": 1,
+  "grid": {
+    "w": 5,
+    "h": 5
+  },
+  "bays": 3,
+  "colors": [
+    "red",
+    "blue"
+  ],
+  "buses": [
+    {
+      "id": 1,
+      "color": "red",
+      "cells": [
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "facing": "down",
+      "capacity": 3
+    },
+    {
+      "id": 2,
+      "color": "red",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 3,
+      "color": "blue",
+      "cells": [
+        [
+          0,
+          4
+        ],
+        [
+          1,
+          4
+        ]
+      ],
+      "facing": "right",
+      "capacity": 3
+    }
+  ],
+  "blocked": [],
+  "queue": [
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    }
+  ],
+  "analysis": {
+    "optimal": 3,
+    "states": 9,
+    "solutionDensity": 1.0,
+    "trapDepth": 4,
+    "forcedRatio": 0.5,
+    "deadEnds": 0,
+    "raw": 0.277,
+    "mds": 3.9
+  },
+  "solution": [
+    1,
+    2,
+    3
+  ]
+}
