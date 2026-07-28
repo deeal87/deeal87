@@ -19,12 +19,12 @@ namespace SunnyStop.Tests
                                                  IReadOnlyList<Cell> blocked = null)
         {
             const int w = 4, h = 4;
-            buses ??= new[]
+            if (buses == null) buses = new[]
             {
                 new Bus(1, "red", new[] { new Cell(1, 0), new Cell(1, 1) }, Facing.Up, 3, w, h),
                 new Bus(2, "blue", new[] { new Cell(1, 2), new Cell(1, 3) }, Facing.Up, 3, w, h)
             };
-            queue ??= new[]
+            if (queue == null) queue = new[]
             {
                 new Passenger("red"), new Passenger("red"), new Passenger("red"),
                 new Passenger("blue"), new Passenger("blue"), new Passenger("blue")

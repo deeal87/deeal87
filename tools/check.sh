@@ -55,6 +55,17 @@ else
   fail "Unity layer does not compile"
 fi
 
+step "Compile the Unity test suite against the stubs"
+# Nothing in the repo should be uncompiled, including the editor tests.
+if mcs -langversion:latest -target:library \
+       -r:"$BUILD/SunnyStop.Core.dll" -r:"$BUILD/SunnyStop.Game.dll" \
+       -out:"$BUILD/SunnyStop.Tests.dll" \
+       tools/unitystub/NUnitStub.cs Assets/Tests/*.cs; then
+  ok "test suite compiles"
+else
+  fail "test suite does not compile"
+fi
+
 step "Cross-language check - C# engine replays every Python-verified level"
 if mcs -langversion:latest -r:"$BUILD/SunnyStop.Core.dll" \
        -out:"$BUILD/crosscheck.exe" tools/crosscheck/CrossCheck.cs; then
