@@ -36,7 +36,21 @@ Assets/Resources/        Baked levels and the 240-card German postcard book.
 Assets/Tests/            NUnit tests, including a cross-language check that the
                          Python-verified solutions replay in the C# engine.
 tools/leveltool/         Level generator, solver and difficulty scorer (Python).
+tools/crosscheck/        Headless harness replaying every level through the C#
+                         engine, proving it agrees with the Python one.
+tools/unitystub/         Stand-in for the Unity API so the game layer can be
+                         compile-checked without the editor.
+tools/check.sh           The whole gate in one command. No Unity needed.
 ```
+
+## Checks
+
+```bash
+tools/check.sh     # python tests, all 200 levels re-solved, both C# assemblies
+                   # compiled, cross-language replay. ~40 seconds.
+```
+
+Runs on every push (`.github/workflows/ci.yml`).
 
 ## Status
 
@@ -46,6 +60,8 @@ Pre-production prototype (M0).
   from the target curve 1.5 points, 197 of 200 within 6. Regenerates in under
   two minutes.
 - Level generator, solver and difficulty scorer: **working**, 35 tests green
+- Both C# assemblies compile, and the C# engine replays all 200 Python-verified
+  solutions move-for-move — checked headlessly, no Unity licence needed
 - Unity prototype: rules, solver-backed hints, free rewind, postcard screen, colour-blind palettes
 - 240 German postcards across six situational categories, all three tones covered
 

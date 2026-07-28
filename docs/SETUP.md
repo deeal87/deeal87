@@ -1,5 +1,17 @@
 # Running the prototype
 
+## The one command that checks everything
+
+```bash
+tools/check.sh
+```
+
+Runs the whole gate with **no Unity required**: the Python rules and content
+tests, a re-solve of all 200 shipped levels, a compile of both C# assemblies,
+and a cross-language check that replays every Python-verified solution through
+the C# engine. Needs `python3` and `mono-mcs`
+(`apt-get install -y mono-mcs mono-runtime`). This is exactly what CI runs.
+
 ## The game (Unity)
 
 There is no `.unity` scene file in the repo on purpose — a binary scene is
@@ -30,9 +42,23 @@ No plugins, packages or asset store dependencies are needed.
 ### Running the C# tests
 
 Window → General → Test Runner → EditMode → Run All. The suite covers the rules,
-the JSON reader, the palettes, the message book, and — most importantly — replays
-every baked level's reference solution through the runtime engine to prove the
-C# and Python rule sets agree.
+the JSON reader, the palettes and the message book.
+
+The same guarantees are checked outside the editor by `tools/check.sh`, which is
+what CI uses — the editor suite is for working inside Unity, not for the gate.
+
+### How the C# is verified without Unity
+
+`Core` has no `UnityEngine` references at all, so it compiles and runs headless.
+The Unity layer is compiled against `tools/unitystub/UnityStub.cs`, a hand-written
+stand-in for the slice of the Unity API the game uses. That catches typos, wrong
+member names and bad signatures on every commit instead of on whoever next opens
+the editor.
+
+The stub mirrors real Unity signatures deliberately. If you touch it, keep it
+accurate — a stub that is more permissive than Unity gives false confidence.
+(It already caught one of its own mistakes: `SleepTimeout` is a static class of
+`const int` in Unity, not an enum.)
 
 ## The level tool (Python)
 

@@ -30,9 +30,9 @@ namespace SunnyStop.Game
         public event Action<int> BusTapped;
 
         private LevelDefinition _level;
-        private readonly Dictionary<int, BusView> _buses = new();
-        private readonly List<GameObject> _passengers = new();
-        private readonly List<Transform> _bayMarkers = new();
+        private readonly Dictionary<int, BusView> _buses = new Dictionary<int, BusView>();
+        private readonly List<GameObject> _passengers = new List<GameObject>();
+        private readonly List<Transform> _bayMarkers = new List<Transform>();
         private Transform _root;
 
         public bool TryGetBus(int busId, out BusView view) => _buses.TryGetValue(busId, out view);
@@ -238,13 +238,16 @@ namespace SunnyStop.Game
             RefreshQueue(state.QueueIndex);
         }
 
-        public static Vector3 FacingToWorld(Facing facing) => facing switch
+        public static Vector3 FacingToWorld(Facing facing)
         {
-            Facing.Up => Vector3.forward,
-            Facing.Down => Vector3.back,
-            Facing.Left => Vector3.left,
-            _ => Vector3.right
-        };
+            switch (facing)
+            {
+                case Facing.Up: return Vector3.forward;
+                case Facing.Down: return Vector3.back;
+                case Facing.Left: return Vector3.left;
+                default: return Vector3.right;
+            }
+        }
 
         // ----- queue ----------------------------------------------------------- //
 

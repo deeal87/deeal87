@@ -17,7 +17,8 @@ namespace SunnyStop.Game
         public const string LevelPath = "Levels/level_";
         public const string MessagePath = "Messages/messages.";
 
-        private static readonly Dictionary<int, LevelDefinition> LevelCache = new();
+        private static readonly Dictionary<int, LevelDefinition> LevelCache =
+            new Dictionary<int, LevelDefinition>();
         private static MessageBook _messageBook;
 
         /// <summary>Level numbers present in the build, ascending.</summary>

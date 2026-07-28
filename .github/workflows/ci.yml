@@ -1,0 +1,29 @@
+name: CI
+
+# The content gate. Levels are generated and proven solvable by the Python tool
+# and played by the C# engine; if the two ever disagree, the game ships a level
+# that is provably solvable and actually is not. That is the worst possible bug
+# for a game whose promise is "hard but never impossible", so it is checked on
+# every commit. None of this needs Unity or a Unity licence.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Mono
+        run: sudo apt-get update && sudo apt-get install -y mono-mcs mono-runtime
+
+      - name: Run the full gate
+        run: bash tools/check.sh

@@ -95,9 +95,9 @@ namespace SunnyStop.Core
                     var path = new List<int>();
                     while (!current.Equals(state))
                     {
-                        (GameState prev, int move) = came[current];
-                        path.Add(move);
-                        current = prev;
+                        var step = came[current];
+                        path.Add(step.move);
+                        current = step.prev;
                     }
                     path.Reverse();
                     return path;

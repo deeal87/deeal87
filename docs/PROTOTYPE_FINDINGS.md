@@ -205,9 +205,19 @@ Those two features are load-bearing now, not nice-to-haves.
 
 Level data is produced and proven correct by the Python tool, then played by the
 C# engine. A rules mismatch between them would mean shipping a level that is
-provably solvable and actually is not. A C# test replays every baked level's
-reference solution move-for-move through the runtime engine; it has to stay
-green alongside the Python content gate.
+provably solvable and actually is not.
+
+This is now checked rather than assumed. `tools/crosscheck` compiles the
+engine-free `Core` and replays every baked level's reference solution
+move-for-move, re-solves each level from the start, and walks each one entirely
+by hint to prove hints never dead-end. All 200 pass in about 3 seconds,
+252 918 states explored, with no Unity involved.
+
+The gate was verified to actually catch regressions rather than pass
+vacuously — a reversed solution, a bus shifted one cell, and a missing postcard
+were each introduced deliberately and each was caught. Worth noting that
+reversing the solution of an *early* level does not fail, and should not: those
+levels are unlosable by design, so every order genuinely wins.
 
 ---
 

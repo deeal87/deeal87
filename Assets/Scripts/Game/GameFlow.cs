@@ -26,8 +26,8 @@ namespace SunnyStop.Game
 
         private LevelDefinition _level;
         private GameState _state;
-        private readonly Stack<GameState> _history = new();
-        private List<int> _available = new();
+        private readonly Stack<GameState> _history = new Stack<GameState>();
+        private List<int> _available = new List<int>();
         private int _levelNumber;
         private bool _busy;
         private bool _levelComplete;

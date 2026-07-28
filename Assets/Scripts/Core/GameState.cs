@@ -205,7 +205,7 @@ namespace SunnyStop.Core
 
         public bool Equals(GameState other)
         {
-            if (other is null) return false;
+            if (ReferenceEquals(other, null)) return false;
             if (QueueIndex != other.QueueIndex) return false;
             if (_bays.Length != other._bays.Length) return false;
             if (_inLot.Count != other._inLot.Count) return false;

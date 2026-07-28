@@ -20,7 +20,8 @@ namespace SunnyStop.Game
 
         public static Mode ColorMode = Mode.Default;
 
-        private static readonly Dictionary<string, Color> DefaultColors = new()
+        private static readonly Dictionary<string, Color> DefaultColors =
+            new Dictionary<string, Color>()
         {
             { "red", new Color(0.91f, 0.35f, 0.33f) },
             { "blue", new Color(0.31f, 0.55f, 0.85f) },
@@ -33,7 +34,8 @@ namespace SunnyStop.Game
         };
 
         // Deuteranopia: red/green separated by lightness and hue distance instead.
-        private static readonly Dictionary<string, Color> DeuteranopiaColors = new()
+        private static readonly Dictionary<string, Color> DeuteranopiaColors =
+            new Dictionary<string, Color>()
         {
             { "red", new Color(0.85f, 0.33f, 0.42f) },
             { "blue", new Color(0.20f, 0.44f, 0.82f) },
@@ -45,7 +47,8 @@ namespace SunnyStop.Game
             { "teal", new Color(0.10f, 0.28f, 0.36f) },
         };
 
-        private static readonly Dictionary<string, Color> TritanopiaColors = new()
+        private static readonly Dictionary<string, Color> TritanopiaColors =
+            new Dictionary<string, Color>()
         {
             { "red", new Color(0.88f, 0.28f, 0.30f) },
             { "blue", new Color(0.35f, 0.68f, 0.78f) },
@@ -58,7 +61,8 @@ namespace SunnyStop.Game
         };
 
         /// <summary>Redundant, non-colour identity for each bus colour.</summary>
-        private static readonly Dictionary<string, string> Glyphs = new()
+        private static readonly Dictionary<string, string> Glyphs =
+            new Dictionary<string, string>()
         {
             { "red", "★" },
             { "blue", "●" },
@@ -72,12 +76,13 @@ namespace SunnyStop.Game
 
         public static Color Of(string colorName)
         {
-            Dictionary<string, Color> table = ColorMode switch
+            Dictionary<string, Color> table;
+            switch (ColorMode)
             {
-                Mode.Deuteranopia => DeuteranopiaColors,
-                Mode.Tritanopia => TritanopiaColors,
-                _ => DefaultColors
-            };
+                case Mode.Deuteranopia: table = DeuteranopiaColors; break;
+                case Mode.Tritanopia: table = TritanopiaColors; break;
+                default: table = DefaultColors; break;
+            }
             return table.TryGetValue(colorName, out Color c) ? c : Color.gray;
         }
 

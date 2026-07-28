@@ -29,13 +29,18 @@ namespace SunnyStop.Core
             SeatsLeft = seatsLeft;
         }
 
-        public override string ToString() => Kind switch
+        public override string ToString()
         {
-            TransitionEventKind.BusDispatched => $"bus {BusId} -> bay {BayIndex}",
-            TransitionEventKind.PassengerBoarded =>
-                $"passenger {QueueIndex} -> bay {BayIndex} ({SeatsLeft} left)",
-            _ => $"bus {BusId} departs bay {BayIndex}"
-        };
+            switch (Kind)
+            {
+                case TransitionEventKind.BusDispatched:
+                    return $"bus {BusId} -> bay {BayIndex}";
+                case TransitionEventKind.PassengerBoarded:
+                    return $"passenger {QueueIndex} -> bay {BayIndex} ({SeatsLeft} left)";
+                default:
+                    return $"bus {BusId} departs bay {BayIndex}";
+            }
+        }
     }
 
     /// <summary>

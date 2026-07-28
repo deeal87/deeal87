@@ -65,14 +65,23 @@ namespace SunnyStop.Core
             ? _bool
             : throw new FormatException($"expected bool, got {Type}");
 
-        public int IntOr(string key, int fallback) =>
-            this[key] is { Type: Kind.Number } v ? v.AsInt() : fallback;
+        public int IntOr(string key, int fallback)
+        {
+            JsonValue v = this[key];
+            return v != null && v.Type == Kind.Number ? v.AsInt() : fallback;
+        }
 
-        public string StringOr(string key, string fallback) =>
-            this[key] is { Type: Kind.String } v ? v.AsString() : fallback;
+        public string StringOr(string key, string fallback)
+        {
+            JsonValue v = this[key];
+            return v != null && v.Type == Kind.String ? v.AsString() : fallback;
+        }
 
-        public bool BoolOr(string key, bool fallback) =>
-            this[key] is { Type: Kind.Bool } v ? v.AsBool() : fallback;
+        public bool BoolOr(string key, bool fallback)
+        {
+            JsonValue v = this[key];
+            return v != null && v.Type == Kind.Bool ? v.AsBool() : fallback;
+        }
 
         // ----- parser -------------------------------------------------------- //
 
