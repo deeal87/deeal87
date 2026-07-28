@@ -17,6 +17,16 @@ you win, you get a kind word on a postcard instead, and you keep it.
 └─────────────────────────────────────┘   Clear the queue to win.
 ```
 
+## Playing it right now, without Unity
+
+```bash
+python3 tools/webpreview/build.py && open tools/webpreview/sunny-stop.html
+```
+
+Builds a single self-contained HTML file with all 200 levels and all 240
+postcards — the real rules, the real hint and rewind behaviour, the real win
+screen. It exists to answer the one question measurement cannot: is it fun.
+
 ## Opening it
 
 Clone the repo and add **the repository folder itself** as a project in Unity
@@ -51,6 +61,8 @@ tools/crosscheck/        Headless harness replaying every level through the C#
                          engine, proving it agrees with the Python one.
 tools/unitystub/         Stand-in for the Unity API so the game layer can be
                          compile-checked without the editor.
+tools/webpreview/        Playable browser build: a JavaScript port of the rules
+                         plus a one-file packer. Validated against all 200 levels.
 tools/check.sh           The whole gate in one command. No Unity needed.
 ProjectSettings/         Editor version pin; Unity generates the rest on open.
 Packages/manifest.json   Package list.

@@ -31,6 +31,23 @@ else
   fail "level verification"
 fi
 
+step "Browser preview - JavaScript engine replays every level"
+if command -v node >/dev/null 2>&1; then
+  # A third implementation of the rules is a third chance to diverge.
+  if node tools/webpreview/validate.js; then
+    ok "javascript engine agrees"
+  else
+    fail "javascript engine disagrees"
+  fi
+  if python3 tools/webpreview/build.py "$BUILD/sunny-stop.html" >/dev/null; then
+    ok "preview builds"
+  else
+    fail "preview does not build"
+  fi
+else
+  printf '\033[33mnode not installed - skipping the browser preview checks.\033[0m\n'
+fi
+
 if ! command -v mcs >/dev/null 2>&1; then
   printf '\n\033[33mmono (mcs) not installed - skipping the C# half.\033[0m\n'
   printf 'Install with: apt-get install -y mono-mcs\n'

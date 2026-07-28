@@ -102,6 +102,27 @@ accurate — a stub that is more permissive than Unity gives false confidence.
 (It already caught one of its own mistakes: `SleepTimeout` is a static class of
 `const int` in Unity, not an enum.)
 
+## The browser preview
+
+A single self-contained HTML file with all 200 levels and all 240 postcards, for
+playing without Unity — on a phone, or to hand to a playtester.
+
+```bash
+python3 tools/webpreview/build.py          # writes tools/webpreview/sunny-stop.html
+node tools/webpreview/validate.js          # replays all 200 levels through the JS engine
+```
+
+The rules live in `tools/webpreview/engine.js`, a third port alongside the Python
+and C# ones. Three implementations means three chances to diverge, so
+`validate.js` replays every shipped level's reference solution through it and
+runs in the same gate as the others.
+
+The preview is a playtest tool, not the product: it has no album, no shop and no
+art. What it does have is the parts that decide whether the design works — the
+board, the chain reaction when a bus fills, hints re-solved from the live
+position, the free rewind the moment a move makes a level unwinnable, and the
+postcard.
+
 ## The level tool (Python)
 
 Needs only Python 3.11+, no packages.
