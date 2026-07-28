@@ -55,6 +55,33 @@ else
   fail "Unity layer does not compile"
 fi
 
+step "Compile the editor scripts against the stubs"
+if mcs -langversion:latest -target:library \
+       -r:"$BUILD/SunnyStop.Core.dll" -r:"$BUILD/SunnyStop.Game.dll" \
+       -out:"$BUILD/SunnyStop.Editor.dll" \
+       tools/unitystub/UnityEditorStub.cs Assets/Editor/*.cs; then
+  ok "editor scripts compile"
+else
+  fail "editor scripts do not compile"
+fi
+
+step "Unity project structure"
+# Unity Hub identifies a project by ProjectSettings/ProjectVersion.txt. Without
+# it the Hub reports "no Unity projects found in this repository and branch".
+STRUCTURE_OK=1
+for required in ProjectSettings/ProjectVersion.txt Packages/manifest.json Assets; do
+  if [ -e "$required" ]; then
+    ok "$required"
+  else
+    fail "missing $required - Unity Hub will not see this as a project"
+    STRUCTURE_OK=0
+  fi
+done
+if [ "$STRUCTURE_OK" -eq 1 ]; then
+  python3 -c "import json,sys; json.load(open('Packages/manifest.json'))" \
+    && ok "manifest.json is valid JSON" || fail "manifest.json is not valid JSON"
+fi
+
 step "Compile the Unity test suite against the stubs"
 # Nothing in the repo should be uncompiled, including the editor tests.
 if mcs -langversion:latest -target:library \

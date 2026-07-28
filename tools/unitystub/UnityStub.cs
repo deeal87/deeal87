@@ -241,6 +241,7 @@ namespace UnityEngine
         public static string GetString(string key, string defaultValue = "") => defaultValue;
         public static void SetString(string key, string value) { }
         public static void DeleteKey(string key) { }
+        public static void DeleteAll() { }
         public static void Save() { }
     }
 

@@ -17,6 +17,16 @@ you win, you get a kind word on a postcard instead, and you keep it.
 └─────────────────────────────────────┘   Clear the queue to win.
 ```
 
+## Opening it
+
+Clone the repo and add **the repository folder itself** as a project in Unity
+Hub (*Add* → *Add project from disk*), then press Play. There is no scene to
+open — the game builds itself at runtime. Then run **Sunny Stop → Apply Project
+Settings** once from the menu bar.
+
+Requires Unity 6 LTS. Full instructions, including what to do if the Hub does
+not see the project, are in [docs/SETUP.md](docs/SETUP.md).
+
 ## Documents
 
 | | |
@@ -28,6 +38,7 @@ you win, you get a kind word on a postcard instead, and you keep it.
 ## Layout
 
 ```
+Assets/                  the Unity project
 Assets/Scripts/Core/     Rules, solver and content loading. No UnityEngine
                          references at all, so it runs headless in CI.
 Assets/Scripts/Game/     Unity presentation. Builds itself at runtime, so the
@@ -41,6 +52,8 @@ tools/crosscheck/        Headless harness replaying every level through the C#
 tools/unitystub/         Stand-in for the Unity API so the game layer can be
                          compile-checked without the editor.
 tools/check.sh           The whole gate in one command. No Unity needed.
+ProjectSettings/         Editor version pin; Unity generates the rest on open.
+Packages/manifest.json   Package list.
 ```
 
 ## Checks
