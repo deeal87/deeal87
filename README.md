@@ -32,7 +32,7 @@ Assets/Scripts/Core/     Rules, solver and content loading. No UnityEngine
                          references at all, so it runs headless in CI.
 Assets/Scripts/Game/     Unity presentation. Builds itself at runtime, so the
                          repo carries no binary scene file.
-Assets/Resources/        Baked levels and the German postcard book.
+Assets/Resources/        Baked levels and the 240-card German postcard book.
 Assets/Tests/            NUnit tests, including a cross-language check that the
                          Python-verified solutions replay in the C# engine.
 tools/leveltool/         Level generator, solver and difficulty scorer (Python).
@@ -42,9 +42,9 @@ tools/leveltool/         Level generator, solver and difficulty scorer (Python).
 
 Pre-production prototype (M0).
 
-- Level generator, solver and difficulty scorer: **working**, 20 tests green
+- Level generator, solver and difficulty scorer: **working**, 30 tests green
 - 12 levels baked (1–10 plus previews of 50 and 120), all verified solvable and on-curve
 - Unity prototype: rules, solver-backed hints, free rewind, postcard screen, colour-blind palettes
-- 66 German postcards across six contextual categories
+- 240 German postcards across six situational categories, all three tones covered
 
 Not built yet: art, audio, the map, the album, the shop, and the remaining 188 levels.

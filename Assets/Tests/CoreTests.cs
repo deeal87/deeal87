@@ -314,11 +314,55 @@ namespace SunnyStop.Tests
         private static MessageBook Book() => ContentLoader.Messages("de");
 
         [Test]
-        public void MessageBookLoads()
+        public void TheFullSetOfCardsIsPresent()
         {
             MessageBook book = Book();
             Assert.IsNotNull(book);
-            Assert.Greater(book.All.Count, 30);
+            // One per level plus headroom, so finishing all 200 never repeats.
+            Assert.AreEqual(240, book.All.Count);
+        }
+
+        [Test]
+        public void EverySituationalCategoryCoversEveryTone()
+        {
+            // Otherwise a player who chose "quiet" gets served the playful
+            // register whenever the picker has to widen its search.
+            MessageBook book = Book();
+            string[] categories = { "recognition", "playful", "gentle", "grounding", "return" };
+            string[] tones = { "warm", "playful", "quiet" };
+
+            foreach (string category in categories)
+            {
+                foreach (string tone in tones)
+                {
+                    int count = 0;
+                    foreach (Postcard c in book.All)
+                    {
+                        if (c.Category == category && c.Tone == tone) count++;
+                    }
+                    Assert.GreaterOrEqual(count, 8,
+                        $"{category}/{tone} has only {count} cards");
+                }
+            }
+        }
+
+        [Test]
+        public void WarmIsTheDefaultAndStaysWarm()
+        {
+            // A fast clean solve normally draws from the "playful" category. A
+            // player on the warm setting must still get a warm-toned card.
+            MessageBook book = Book();
+            var ctx = new WinContext(7, 1, false, 12, 0);
+            Assert.AreEqual("playful", MessageBook.CategoryFor(ctx));
+
+            var seen = new List<string>();
+            for (int i = 0; i < 12; i++)
+            {
+                Postcard card = book.Pick(ctx, ToneSetting.Warm, seen);
+                Assert.AreEqual("warm", card.Tone,
+                    $"warm player was served a {card.Tone} card: \"{card.Text}\"");
+                seen.Add(card.Id);
+            }
         }
 
         [Test]
