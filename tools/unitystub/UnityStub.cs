@@ -100,6 +100,8 @@ namespace UnityEngine
         public Transform parent { get; set; }
         public void SetParent(Transform p, bool worldPositionStays) { }
         public void SetParent(Transform p) { }
+        public Vector3 InverseTransformPoint(Vector3 position) => position;
+        public Vector3 TransformPoint(Vector3 position) => position;
         public IEnumerator GetEnumerator() => null;
     }
 
@@ -146,6 +148,7 @@ namespace UnityEngine
 
     public class Renderer : Component
     {
+        public bool enabled { get; set; }
         public Material material { get; set; }
         public Material sharedMaterial { get; set; }
     }

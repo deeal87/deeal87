@@ -10,14 +10,17 @@
       <p class="blind-dest">Sunny Stop</p>
       <p class="blind-sub" id="blindSub"></p>
     </div>
-    <button class="blind-pick" id="pick" type="button">LEVEL</button>
+    <button class="blind-pick" id="pick" type="button">KARTE</button>
   </header>
 
   <div class="stage">
     <div class="lot" id="lot"></div>
     <div class="bays" id="bays"></div>
     <div class="platform">
-      <span class="platform-label">Bahnsteig — nur der Vorderste steigt ein</span>
+      <span class="platform-label">
+        <span>Bahnsteig — nur der Vorderste steigt ein</span>
+        <span id="queueCount"></span>
+      </span>
       <div class="queue" id="queue"></div>
     </div>
   </div>
@@ -31,8 +34,8 @@
   </div>
 
   <p class="hint-note">
-    Tippe einen Bus an. Er fährt geradeaus los und dockt in der linken freien Bucht an.
-    Nur farbgleiche Fahrgäste steigen ein — und immer nur der Vorderste.
+    Tippe einen Bus an. Er fährt geradeaus los und dockt in der linken freien Bucht an —
+    dann rollen die Bälle vom Bahnsteig auf die Sitze. Nur farbgleiche, und immer nur der Vorderste.
   </p>
 </div>
 

@@ -137,11 +137,16 @@ namespace SunnyStop.Game
                         break;
 
                     case TransitionEventKind.PassengerBoarded:
+                    {
                         // The queue view is rebuilt from the level index, so the slot
                         // of the boarding passenger is always 0 relative to the head.
-                        yield return _board.PlayBoarding(0, evt.BayIndex, evt.SeatsLeft);
+                        Passenger boarding = _level.Queue[evt.QueueIndex];
+                        yield return _board.PlayBoarding(
+                            0, evt.BayIndex, evt.SeatsLeft,
+                            evt.BusId, boarding.Seats, boarding.Color);
                         _board.RefreshQueue(evt.QueueIndex + 1);
                         break;
+                    }
 
                     case TransitionEventKind.BusDeparted:
                         yield return _board.PlayDeparture(evt.BusId);

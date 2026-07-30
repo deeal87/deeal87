@@ -185,12 +185,32 @@ namespace SunnyStop.Game
             if (glyphRenderer != null && textMesh.font != null)
                 glyphRenderer.material = textMesh.font.material;
 
+            // Seat sockets, in boarding order. They start hidden and light up as
+            // balls arrive, so capacity is countable without reading a number.
+            var view0 = go.AddComponent<BusView>();
+            for (int i = 0; i < bus.Capacity; i++)
+            {
+                var seat = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                seat.name = $"Seat {i}";
+                seat.transform.SetParent(go.transform, false);
+                seat.transform.localScale = Vector3.one * 0.19f;
+                float t = bus.Capacity == 1 ? 0.5f : i / (float)(bus.Capacity - 1);
+                float along = (t - 0.5f) * (length - 0.34f);
+                Vector3 axis = horizontal ? Vector3.right : Vector3.forward;
+                seat.transform.localPosition = axis * along + Vector3.up * 0.3f;
+                Paint(seat, new Color(0.16f, 0.16f, 0.18f));
+                Destroy(seat.GetComponent<Collider>());
+                var seatRenderer = seat.GetComponent<Renderer>();
+                if (seatRenderer != null) seatRenderer.enabled = false;
+                view0.AddSeat(seat.transform);
+            }
+
             var collider = go.AddComponent<BoxCollider>();
             collider.size = horizontal
                 ? new Vector3(length, 0.7f, 0.9f)
                 : new Vector3(0.9f, 0.7f, length);
 
-            var view = go.AddComponent<BusView>();
+            BusView view = view0;
             view.Initialise(bus, body.GetComponent<Renderer>());
             view.Tapped += id => BusTapped?.Invoke(id);
             _buses[bus.Id] = view;
@@ -264,10 +284,10 @@ namespace SunnyStop.Game
             for (int i = fromIndex; i < _level.Queue.Count && shown < MaxVisibleQueue; i++, shown++)
             {
                 Passenger passenger = _level.Queue[i];
-                var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 go.name = $"Passenger {i} ({passenger.Color})";
                 go.transform.SetParent(_root, false);
-                go.transform.localScale = new Vector3(0.30f, 0.22f, 0.30f);
+                go.transform.localScale = Vector3.one * (passenger.Luggage ? 0.34f : 0.28f);
                 go.transform.localPosition = QueuePosition(shown);
                 Paint(go, Palette.Of(passenger.Color));
                 Destroy(go.GetComponent<Collider>());
@@ -307,14 +327,19 @@ namespace SunnyStop.Game
             view.SetDocked(true);
         }
 
-        public IEnumerator PlayBoarding(int queueSlot, int bayIndex, int seatsLeft)
+        public IEnumerator PlayBoarding(int queueSlot, int bayIndex, int seatsLeft,
+                                        int busId, int seats, string color)
         {
             if (queueSlot >= _passengers.Count) yield break;
             GameObject passenger = _passengers[queueSlot];
             if (passenger == null) yield break;
 
+            // Fly to the seat the passenger will actually occupy.
+            _buses.TryGetValue(busId, out BusView bus);
             Vector3 from = passenger.transform.localPosition;
-            Vector3 to = BayPosition(bayIndex) + Vector3.up * 0.3f;
+            Vector3 to = bus != null
+                ? _root.InverseTransformPoint(bus.NextSeatPosition())
+                : BayPosition(bayIndex) + Vector3.up * 0.3f;
 
             float elapsed = 0f;
             while (elapsed < BoardDuration)
@@ -329,6 +354,7 @@ namespace SunnyStop.Game
                 yield return null;
             }
             Destroy(passenger);
+            if (bus != null) bus.FillSeats(seats, Palette.Of(color));
         }
 
         public IEnumerator PlayDeparture(int busId)

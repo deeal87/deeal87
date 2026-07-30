@@ -332,8 +332,11 @@ the natural home for the paid cosmetic packs (§8).
 `Splash → Map → Level → Win (postcard) → Map` — that is the whole loop. Everything else
 (Album, Settings, Shop, Daily) hangs off the Map.
 
-- **Map** — a vertical scrolling bus route with 200 stops, 8 chapters of 25, each with its
-  own palette and background art. Your bus token sits on your current stop.
+- **Map** — a vertical scrolling bus route: an actual winding road with 200 stops along it,
+  8 chapters of 25, each tinted with its own time of day and dotted with roadside scenery
+  (houses, trees). Beaten stops fill in, milestones every 25 are larger stations, and your
+  bus token sits on the current stop. It is a place you travel through, not a grid of
+  numbered buttons.
 - **Level** — board fills the screen, minimal chrome: back, restart, hint, undo, move
   counter. No timers on screen. No pop-ups mid-level, ever.
 - **Album** — the postcard collection.
@@ -492,9 +495,19 @@ the look anyway. The
 palette shifts per chapter: morning yellow → midday blue → sunset orange → night indigo →
 rain → snow → festival → dawn.
 
-**Passengers:** simple rounded characters with strong silhouettes and one accessory each;
-readable at 40 px. Idle animations (checking watch, waving, yawning) so the queue feels
-alive without distracting.
+**Passengers are balls.** Glossy coloured spheres, each carrying its colour-blind glyph,
+queuing on the platform and then physically *rolling into a seat inside the bus*. This
+replaced the earlier "little characters" idea and is a much better call:
+
+- **Capacity becomes countable.** Every bus shows its seat sockets, so "this one holds
+  three" is something you see rather than read. Double-deckers are obviously bigger.
+- **Boarding becomes visible.** A ball leaves the platform, arcs across and lands in a
+  specific seat. The chain reaction when a bus fills reads as a chain reaction.
+- **It stays legible at 24 px** on a phone, which detailed characters do not.
+- Luggage passengers take two sockets: the ball plus a small case beside it.
+
+Character personality moves to the bus instead — friendly proportions, a windscreen, a
+destination sign carrying the glyph, headlights and visible wheels.
 
 **Postcards:** a distinctly different, hand-made illustration style — gouache/riso texture,
 hand-lettered headline. The contrast with the clean 3D board is what makes the moment land.
