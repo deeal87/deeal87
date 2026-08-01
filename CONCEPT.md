@@ -52,18 +52,30 @@ free-to-play.
 
 ### 3.1 The board
 
+Top to bottom, the screen is a tray of waiting passengers, a row of stands, and the lot.
+
 ```
 ┌─────────────────────────────────────┐
-│   MOTORWAY (grid, 5×5 → 9×10)       │   Buses, each with a colour and a
-│   ┌──┐ ┌────┐ ┌──┐                  │   facing direction. A bus occupies
-│   │▲R│ │ ◀B │ │▲G│  ← buses         │   1×2 or 1×3 cells.
-│   └──┘ └────┘ └──┘                  │
+│ ⚙ ↺ ┃    LEVEL 137    ┃  ● 42       │   HUD floats over the tray rim.
+│ ╭─────────────────────────────────╮ │
+│ │ ● ● ● ● ● ● ● ● ● ● ● ●         │ │   THE TRAY. Every passenger still
+│ │● ● ● ● ● ● ● ● ● ● ● ●          │ │   waiting, packed hex-fashion into
+│ │ ● ● ● ● ● ● ● ● ● ● ● ●         │ │   one recessed board. It drains
+│ │● ● ● ● ● ● ● ● ● ● ● ●          │ │   from the bottom row: the front of
+│ │ ⊙ ● ● ● ● ● ● ● ● ● ● ●         │ │   the queue is always the floor,
+│ ╰─────────────────────────────────╯ │   and ⊙ is the one boarding next.
 ├─────────────────────────────────────┤
-│  ▣1 ▣2 ▣3 ▣4 ▨5 ▨6                  │   Six numbered stands, 3–4 in service.
+│  ▁1  ▁2  ▁3  ▁4  ▨5  ▨6             │   Six painted stands, 3–4 in service.
+├═════════════════════════════════════┤
+│   ┌──┐  ┌──────┐   ┌──┐             │   THE LOT (grid, 5×5 → 9×10). Each
+│   │ ↑│  │  ←   │   │ ↑│             │   vehicle carries one big white
+│   └──┘  └──────┘   └──┘             │   arrow: the direction it leaves in.
+│      ┌──────┐   ┌──┐                │   A vehicle occupies 1×2 (3 seats)
+│      │  →   │   │ ↓│                │   or 1×3 cells (6 seats).
+│      └──────┘   └──┘                │
 ├─────────────────────────────────────┤
-│   ●   ●     ●    ●   ●   ●          │   Forecourt: a scattered crowd, not
-│     ●    ●     ●    ●      ●        │   a line. One is marked as next.
-└─────────────────────────────────────┘   Only that one can board.
+│  TIPP   ZURÜCK   NEU   KARTE        │   Dock.
+└─────────────────────────────────────┘
 ```
 
 ### 3.2 Rules
@@ -78,12 +90,21 @@ free-to-play.
    forward — a green passenger at the head blocks the blue behind them until a green bus
    is docked.
 
-   Presentationally the crowd is **scattered across a forecourt, not queued in a line**.
-   A tidy left-to-right queue let the player read the entire future at a glance, so the
-   next move was never a judgement call. The scatter is *seeded from the level id*, so it
-   is identical for every player and on every replay — the board stays reproducible and
-   the solver still answers exactly, which is what the free rewind depends on. It looks
-   unpredictable; it is not, and it must never become so (§5.1).
+   Presentationally the crowd is **one packed tray, not a queue in a line**. A tidy
+   left-to-right line let the player read the entire future at a glance, so the next move
+   was never a judgement call; a mass of fifty balls has to be scanned. The pile drains
+   from the bottom row, so the ordering information is still *there* — it just costs a
+   look rather than being free.
+
+   Two constraints on that tray, both load-bearing:
+
+   - Every waiting passenger is drawn. No "+12 more" caption — if the queue order decides
+     the level, the player must be able to see all of it.
+   - The jitter that stops it looking like a spreadsheet is **seeded from the level id and
+     the passenger's own queue index**, never random at runtime. It is identical for every
+     player and on every replay, so the board stays reproducible and the solver still
+     answers exactly — which is what the free rewind depends on (§5.1). It looks loose; it
+     is not, and it must never become so.
 4. A bus **departs when full** (capacity 3 standard, 6 double-decker), freeing its bay.
    A bus that is not full stays docked.
 5. **Win:** the queue is empty.
@@ -495,29 +516,48 @@ valuable piece of infrastructure in the project.
 
 ## 10. Art & audio direction
 
-**Look:** the board is a **stretch of motorway seen from above** — asphalt, broken lane
-markings, a hard shoulder and a crash barrier down each side, with distance markers
-painted on the tarmac. The traffic continues past the board down both verges. Buses are
-rounded and friendly with thick proportions, warm sunlight, long soft shadows. Cosy, not corporate. For 1.0
-this is built from a single free low-poly kit rather than commissioned models (§13) — the
-coherence comes from lighting, palette and camera, which cost nothing and carry most of
-the look anyway. The
-palette shifts per chapter: morning yellow → midday blue → sunset orange → night indigo →
-rain → snow → festival → dawn.
+**Look:** bright, glossy, high-contrast plastic — the shelf-appeal register of the genre
+rather than an illustration style. Three horizontal bands fill the screen (§3.1):
 
-**Passengers are balls.** Glossy coloured spheres, each carrying its colour-blind glyph,
-queuing on the platform and then physically *rolling into a seat inside the bus*. This
-replaced the earlier "little characters" idea and is a much better call:
+- **The tray.** A recessed board with a heavy rim, packed edge to edge with glossy
+  spheres. The rim is deep at the top because that band is where the HUD floats, so the
+  controls never sit on a ball the player is trying to read.
+- **The stands.** Painted parking markings on the apron — white, skewed a few degrees so
+  they read as ground rather than as UI. Stands not in service this level are hatched out.
+- **The lot.** A warm beige apron of chunky vehicles. Each carries **one big white arrow**
+  giving the direction it will leave in, which is the only thing that has to be legible
+  from across the board. Length carries capacity: 1×2 is three seats, 1×3 is six.
 
-- **Capacity becomes countable.** Every bus shows its seat sockets, so "this one holds
-  three" is something you see rather than read. Double-deckers are obviously bigger.
-- **Boarding becomes visible.** A ball leaves the platform, arcs across and lands in a
+For 1.0 this is built from a single free low-poly kit rather than commissioned models
+(§13) — the coherence comes from lighting, palette and camera, which cost nothing and
+carry most of the look anyway. The chapter palette still shifts the backdrop: morning
+yellow → midday blue → sunset orange → night indigo → rain → snow → festival → dawn.
+
+Two earlier directions were tried and dropped, and it is worth recording why:
+
+- The **motorway board** (asphalt, lane markings, crash barriers, traffic down the verges)
+  was handsome but fought the pieces: painted lines and vehicle bodies compete at the same
+  scale and the arrows stopped popping. The lot is now plain.
+- **Destination signs, headlights and visible wheels** on every bus were detail nobody
+  could resolve at 26 px once the board reached 9×10. All that survives is a small dark
+  cab window, plus a tiny chip carrying the colour-blind glyph at the tail.
+
+**Passengers are balls.** Glossy coloured spheres that physically *fly out of the tray and
+land in a seat inside the bus*. This replaced the earlier "little characters" idea and is
+a much better call:
+
+- **Capacity becomes countable.** Every vehicle shows its seat sockets along its lower
+  edge, so "this one holds three" is something you see rather than read. Parked at a stand
+  the arrow disappears and the sockets grow, because that is where you actually watch.
+- **Boarding becomes visible.** A ball leaves the tray, arcs across and lands in a
   specific seat. The chain reaction when a bus fills reads as a chain reaction.
 - **It stays legible at 24 px** on a phone, which detailed characters do not.
 - Luggage passengers take two sockets: the ball plus a small case beside it.
 
-Character personality moves to the bus instead — friendly proportions, a windscreen, a
-destination sign carrying the glyph, headlights and visible wheels.
+The colour-blind glyph rides on the ball at low contrast — findable when you look for it,
+invisible at a glance, so a full tray still reads as a mass of colour rather than a sheet
+of symbols. Colours are a single saturated table shared by the Unity build and the browser
+preview (`Palette.DefaultColors` ↔ `COLORS` in `game.js`) so the two cannot drift.
 
 **Postcards:** a distinctly different, hand-made illustration style — gouache/riso texture,
 hand-lettered headline. The contrast with the clean 3D board is what makes the moment land.

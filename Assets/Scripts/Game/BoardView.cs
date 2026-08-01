@@ -18,8 +18,15 @@ namespace SunnyStop.Game
         public const float CellSize = 1f;
         private const float BayRowOffset = 1.9f;
         private const float QueueRowOffset = 3.4f;
-        private const float PassengerSpacing = 0.52f;
-        private const int MaxVisibleQueue = 14;
+
+        // The waiting crowd is one packed tray rather than a line (CONCEPT.md
+        // §3.1). Row 0 is nearest the stands and is the front of the queue; the
+        // pile drains towards the board, so the ordering is still readable but
+        // costs a look instead of being free.
+        private const int TrayColumns = 12;
+        private const float TrayWidth = 6.4f;
+        private const float TraySpacing = TrayWidth / TrayColumns;
+        private const float TrayRowPitch = TraySpacing * 0.86f;
 
         public float DriveOutDuration = 0.34f;
         public float DockDuration = 0.30f;
@@ -57,8 +64,48 @@ namespace SunnyStop.Game
             return new Vector3(bayIndex * 1.6f - span * 0.5f, 0f, FrontRowZ - BayRowOffset);
         }
 
-        private Vector3 QueuePosition(int slot) => new Vector3(
-            -2.4f + slot * PassengerSpacing, 0.25f, FrontRowZ - QueueRowOffset);
+        /// <summary>
+        /// Where the k-th still-waiting passenger stands. k = 0 boards next.
+        /// Hexagonal packing: odd rows hold one fewer and are inset by half a
+        /// place, which is what makes it read as a pile rather than a grid.
+        /// </summary>
+        private Vector3 QueuePosition(int k)
+        {
+            int row = 0;
+            int consumed = 0;
+            while (true)
+            {
+                int perRow = (row % 2 == 0) ? TrayColumns : TrayColumns - 1;
+                if (k < consumed + perRow) break;
+                consumed += perRow;
+                row++;
+            }
+
+            int column = k - consumed;
+            float inset = (row % 2 == 0) ? 0f : TraySpacing * 0.5f;
+            float x = -TrayWidth * 0.5f + TraySpacing * 0.5f + inset + column * TraySpacing;
+            float z = FrontRowZ - QueueRowOffset - row * TrayRowPitch;
+            return new Vector3(x, 0.25f, z);
+        }
+
+        /// <summary>
+        /// Deterministic scatter in the range -0.5..0.5.
+        ///
+        /// Seeded from the level and the passenger's own queue index, never from
+        /// a runtime RNG: the board has to be identical for every player and on
+        /// every replay, or the solver behind the free rewind is answering about
+        /// a different board than the one on screen (CONCEPT.md §3.2, §5.1).
+        /// This must match the browser preview's `seeded()`.
+        /// </summary>
+        private static float Jitter(int levelId, int queueIndex, int salt)
+        {
+            unchecked
+            {
+                uint s = (uint)(levelId * 7919 + queueIndex * 131 + salt * 17);
+                s = s * 1664525u + 1013904223u;
+                return s / 4294967296f - 0.5f;
+            }
+        }
 
         // ----- construction ---------------------------------------------------- //
 
@@ -95,15 +142,42 @@ namespace SunnyStop.Game
             Paint(lot, new Color(0.86f, 0.85f, 0.80f));
             Destroy(lot.GetComponent<Collider>());
 
-            var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            platform.name = "Platform";
-            platform.transform.SetParent(_root, false);
-            platform.transform.localScale = new Vector3(
-                _level.Width * CellSize + 2.5f, 0.2f, 2.9f);
-            platform.transform.localPosition =
-                new Vector3(0f, -0.12f, FrontRowZ - (BayRowOffset + QueueRowOffset) * 0.5f);
-            Paint(platform, new Color(0.78f, 0.77f, 0.73f));
-            Destroy(platform.GetComponent<Collider>());
+            // The apron the stands are painted on.
+            var apron = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            apron.name = "Apron";
+            apron.transform.SetParent(_root, false);
+            apron.transform.localScale = new Vector3(
+                _level.Width * CellSize + 2.5f, 0.2f, QueueRowOffset - 0.4f);
+            apron.transform.localPosition = new Vector3(
+                0f, -0.12f, FrontRowZ - (QueueRowOffset + 0.4f) * 0.5f);
+            Paint(apron, new Color(0.78f, 0.77f, 0.73f));
+            Destroy(apron.GetComponent<Collider>());
+
+            // The tray the crowd stands in: a recessed board sized to hold the
+            // whole queue, so it never resizes as the pile drains.
+            int rows = TrayRowCount(_level.Queue.Count);
+            var tray = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            tray.name = "Tray";
+            tray.transform.SetParent(_root, false);
+            tray.transform.localScale = new Vector3(
+                TrayWidth + 0.5f, 0.18f, (rows - 1) * TrayRowPitch + TraySpacing + 0.5f);
+            tray.transform.localPosition = new Vector3(
+                0f, -0.16f, FrontRowZ - QueueRowOffset - (rows - 1) * TrayRowPitch * 0.5f);
+            Paint(tray, new Color(0.70f, 0.70f, 0.69f));
+            Destroy(tray.GetComponent<Collider>());
+        }
+
+        /// <summary>How many hex rows it takes to hold <paramref name="count"/> passengers.</summary>
+        private static int TrayRowCount(int count)
+        {
+            int rows = 0;
+            int held = 0;
+            while (held < count)
+            {
+                held += (rows % 2 == 0) ? TrayColumns : TrayColumns - 1;
+                rows++;
+            }
+            return Mathf.Max(1, rows);
         }
 
         private void BuildBlockedCells()
@@ -280,15 +354,22 @@ namespace SunnyStop.Game
             }
             _passengers.Clear();
 
+            // Every waiting passenger is drawn. The queue order decides the level,
+            // so hiding the tail behind a "+n more" would be hiding the puzzle.
             int shown = 0;
-            for (int i = fromIndex; i < _level.Queue.Count && shown < MaxVisibleQueue; i++, shown++)
+            for (int i = fromIndex; i < _level.Queue.Count; i++, shown++)
             {
                 Passenger passenger = _level.Queue[i];
                 var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 go.name = $"Passenger {i} ({passenger.Color})";
                 go.transform.SetParent(_root, false);
                 go.transform.localScale = Vector3.one * (passenger.Luggage ? 0.34f : 0.28f);
-                go.transform.localPosition = QueuePosition(shown);
+
+                Vector3 slot = QueuePosition(shown);
+                slot.x += Jitter(_level.Id, i, 1) * TraySpacing * 0.12f;
+                slot.z += Jitter(_level.Id, i, 2) * TraySpacing * 0.12f;
+                go.transform.localPosition = slot;
+
                 Paint(go, Palette.Of(passenger.Color));
                 Destroy(go.GetComponent<Collider>());
 
@@ -296,12 +377,6 @@ namespace SunnyStop.Game
                 if (shown == 0) go.transform.localScale *= 1.25f;
 
                 _passengers.Add(go);
-            }
-
-            if (_level.Queue.Count - fromIndex > MaxVisibleQueue)
-            {
-                // Deliberately no "+n more" label in the prototype: the peek limit is
-                // part of the puzzle (CONCEPT.md §4, "queue peek").
             }
         }
 

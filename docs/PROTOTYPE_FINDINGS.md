@@ -212,6 +212,34 @@ breather: level 180 targeted 34.7 and the easiest of hundreds of candidates stil
 a genuinely smaller board — about 60% of the bus count, fewer cones and fewer surplus
 buses — and land on target (level 180 now scores 36.2).
 
+## 18. The presentation had to be rebuilt around a reference, and one measured
+thing came out of it
+
+The player supplied a screenshot of the look they wanted and asked to get as
+close to it as possible. Structurally it mapped onto the existing rules with
+nothing to change: a packed tray of balls at the top is the passenger queue, a
+row of painted markings in the middle is the stands, and a lot of arrow-marked
+vehicles at the bottom is the lot. No rule, level or difficulty number moved —
+only `styles.css`, the render functions in `game.js`, and `Palette.cs`.
+
+The one finding worth keeping is about colour, and it is counter-intuitive.
+After the first pass the tray looked pastel and the identical hues on the buses
+looked saturated. Sampling the rendered pixels showed the balls were *exactly*
+their base colour — e.g. pink measured (232, 92, 168) against a specified
+`#E85CA8`. The wash was not the fill at all; it was the light tray showing
+through the gaps that the scatter-jitter opened between the balls. Cutting the
+jitter from ±16% of a ball diameter to ±6% and darkening the tray floor fixed it
+without touching a single colour value.
+
+Two consequences worth carrying forward:
+
+- Trust the measurement over the impression, but measure the *composition*, not
+  just the element. The element was right and the picture was still wrong.
+- Simultaneous contrast is real and asymmetric: on the dark theme the same
+  verified-correct hues read duller again, which is why the balls get a thin rim
+  light in dark mode only. Do not "fix" that by changing the palette per theme —
+  the palette is shared with Unity and must stay one table.
+
 ## 11. Early levels are unlosable, and that is correct
 
 Ten levels in chapter 1 have solution density 1.00 — every legal move keeps the

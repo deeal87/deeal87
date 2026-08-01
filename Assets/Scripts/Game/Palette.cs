@@ -20,17 +20,21 @@ namespace SunnyStop.Game
 
         public static Mode ColorMode = Mode.Default;
 
+        // Saturated plastics, matched to the browser preview's COLORS table so
+        // the two builds cannot drift apart. The previous, softer illustration
+        // palette went pastel once the passengers were packed into a tray, and
+        // telling two mid-tone hues apart across fifty balls got hard.
         private static readonly Dictionary<string, Color> DefaultColors =
             new Dictionary<string, Color>()
         {
-            { "red", new Color(0.91f, 0.35f, 0.33f) },
-            { "blue", new Color(0.31f, 0.55f, 0.85f) },
-            { "green", new Color(0.42f, 0.72f, 0.42f) },
-            { "yellow", new Color(0.95f, 0.78f, 0.30f) },
-            { "purple", new Color(0.63f, 0.47f, 0.80f) },
-            { "orange", new Color(0.93f, 0.58f, 0.31f) },
-            { "pink", new Color(0.93f, 0.60f, 0.72f) },
-            { "teal", new Color(0.31f, 0.74f, 0.72f) },
+            { "red", new Color(0.894f, 0.263f, 0.235f) },     // #E4433C
+            { "blue", new Color(0.239f, 0.455f, 0.871f) },    // #3D74DE
+            { "green", new Color(0.247f, 0.757f, 0.333f) },   // #3FC155
+            { "yellow", new Color(0.941f, 0.706f, 0.157f) },  // #F0B428
+            { "purple", new Color(0.545f, 0.267f, 0.776f) },  // #8B44C6
+            { "orange", new Color(0.941f, 0.518f, 0.165f) },  // #F0842A
+            { "pink", new Color(0.910f, 0.361f, 0.659f) },    // #E85CA8
+            { "teal", new Color(0.184f, 0.749f, 0.682f) },    // #2FBFAE
         };
 
         // Deuteranopia: red/green separated by lightness and hue distance instead.

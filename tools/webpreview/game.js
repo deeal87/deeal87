@@ -5,13 +5,17 @@
 // rewind offered the instant a move makes a level unwinnable, hints re-solved
 // from the current position, and a win screen with no timer and nothing to sell.
 //
-// Two presentation ideas carry most of the readability:
-//   * Passengers are balls, and a boarding ball physically flies from the
-//     platform into a seat inside the bus. Capacity stops being a number and
-//     becomes a row of sockets you can count at a glance.
+// Three presentation ideas carry most of the readability:
+//   * Passengers are balls packed into one recessed tray, and a boarding ball
+//     physically flies out of the tray into a seat inside the bus. Capacity
+//     stops being a number and becomes a row of sockets you can count.
 //   * A bus is drawn nose-right and the whole element is rotated to face, so
 //     one piece of markup covers all four directions and driving off is just
-//     `rotate(a) translateX(d)`.
+//     `rotate(a) translateX(d)`. Each one carries one big white arrow, so the
+//     direction it will leave in is legible without reading anything.
+//   * The tray never resizes during a level. It is sized once from the full
+//     queue, so the pile shrinks inside a fixed board instead of the whole
+//     screen reflowing every time somebody gets on.
 
 'use strict';
 
@@ -19,9 +23,11 @@
   const E = window.Engine;
   const DATA = window.SUNNY_DATA;
 
+  // Sampled off the reference screenshot: saturated, high-contrast plastics
+  // rather than the muted illustration palette this used to carry.
   const COLORS = {
-    red: '#D9534F', blue: '#4A7FBF', green: '#5AA75A', yellow: '#D9A404',
-    purple: '#8E6FC4', orange: '#DE8843', pink: '#DB8FA8', teal: '#3FA6A0',
+    red: '#E4433C', blue: '#3D74DE', green: '#3FC155', yellow: '#F0B428',
+    purple: '#8B44C6', orange: '#F0842A', pink: '#E85CA8', teal: '#2FBFAE',
   };
   const GLYPHS = {
     red: '★', blue: '●', green: '▲', yellow: '◆',
@@ -41,7 +47,6 @@
     { name: 'Morgengrauen', tint: 'rgba(246, 197, 150, .34)' },
   ];
 
-  const MAX_QUEUE_SHOWN = 15;
   const STORE = 'sunnystop.preview';
 
   const $ = (s) => document.querySelector(s);
@@ -113,12 +118,13 @@
     history: [],
     busy: false,
     done: false,
-    cell: 44,
+    cell: 34,
     // Visual bays lag the rules by one animation: they show balls arriving one
     // at a time, while the engine has already resolved the whole cascade.
     bays: [],
     queueAt: 0,
     pending: null,
+    tray: null,   // fixed for the whole level; see trayLayout()
   };
 
   const levelData = (n) => DATA.levels.find((l) => l.id === n);
@@ -144,6 +150,7 @@
     app.history = [];
     app.busy = false;
     app.done = false;
+    app.tray = null;
     syncVisuals();
 
     const s = load();
@@ -168,11 +175,65 @@
     }
   }
 
+  /**
+   * The lot has to fit whatever the tray, the stands and the dock leave over.
+   * Late boards are 9x10, so this is nearly always height-bound, not width-
+   * bound - which is exactly the "everything smaller" the reference shows.
+   */
   function cellSize() {
-    const avail = Math.min(window.innerWidth - 14, 520);
-    // Late boards are 9x10, so cells have to be small enough for the widest one
-    // to fit a phone without scrolling.
-    return Math.max(20, Math.min(46, Math.floor(avail / app.level.width)));
+    const availW = Math.min(window.innerWidth - 18, 414);
+    const byW = Math.floor(availW / app.level.width);
+    const chrome = 30                                  // top padding
+      + (app.tray ? app.tray.h + 72 : 190)             // tray, plus its deep rim
+      + 58 + 30 + 70 + 34;                             // stands, grip, dock, status
+    const byH = Math.floor((window.innerHeight - chrome) / app.level.height);
+    // Early boards are 5x5 with room to spare, so let the vehicles grow into
+    // it rather than leaving a half-empty apron under the stands.
+    return Math.max(15, Math.min(64, Math.min(byW, byH)));
+  }
+
+  /**
+   * Pack the crowd into a hexagonal pile, biggest ball that still fits.
+   *
+   * Sized once per level from the FULL queue and then frozen: if the tray
+   * shrank as the pile emptied, the lot underneath would jump on every board.
+   */
+  const TRAY_MIN_H = 108;   // so a nine-passenger level still reads as a board
+
+  function trayLayout(n, width, maxH) {
+    for (let d = 44; d >= 11; d--) {
+      // Leave a margin either side, or the ring on the next-to-board ball gets
+      // clipped by the tray wall.
+      const cols = Math.floor((width - 14) / d);
+      if (cols < 4) continue;
+      let count = 0, rows = 0;
+      while (count < n) { count += (rows % 2 === 0) ? cols : cols - 1; rows++; }
+      const h = Math.round(rows * d * 0.84 + d * 0.14 + 6);
+      if (h <= maxH) return { d, cols, rows, h: Math.max(TRAY_MIN_H, h), width };
+    }
+    const d = 11;
+    return { d, cols: Math.max(4, Math.floor((width - 6) / d)), rows: 0, h: maxH, width };
+  }
+
+  /** Where the k-th still-waiting passenger sits. k = 0 boards next. */
+  function traySlot(k, t) {
+    let row = 0, base = 0;
+    for (;;) {
+      const per = (row % 2 === 0) ? t.cols : t.cols - 1;
+      if (k < base + per) {
+        const off = (row % 2 === 0) ? 0 : t.d / 2;
+        return {
+          // Odd rows are inset by half a ball - that is what makes it a pile
+          // rather than a spreadsheet.
+          left: (t.width - t.cols * t.d) / 2 + off + (k - base) * t.d,
+          // Rows stack up from the floor of the tray, so the pile drains
+          // downwards and the front of the queue is always along the bottom.
+          top: t.h - (row + 1) * t.d * 0.84 - 3,
+          row,
+        };
+      }
+      base += per; row++;
+    }
   }
 
   // ---- pieces ------------------------------------------------------------ //
@@ -184,23 +245,27 @@
   }
 
   /**
-   * A bus, drawn nose-right. `rotate` orients it; everything inside stays
-   * upright because the sign counter-rotates.
+   * A vehicle, always drawn nose-right; the wrapper is rotated to face.
+   *
+   * In the lot it carries one big white arrow - the direction it will leave in
+   * is the only thing you need to read there. Parked at a stand the arrow goes
+   * away and the seats grow, because that is where the balls actually land.
    */
-  function busBody(bus, seats, rotate) {
-    const body = el('div', 'body');
+  function busBody(bus, seats, opts) {
+    const o = opts || {};
+    const body = el('div', 'body' + (o.parked ? ' parked' : ''));
     body.style.setProperty('--bus', COLORS[bus.color] || '#888');
-    body.style.setProperty('--seat', Math.round(app.cell * 0.30) + 'px');
+    body.style.setProperty('--seat', (o.seat || Math.round(app.cell * 0.22)) + 'px');
 
-    body.appendChild(el('div', 'screen'));
-    body.appendChild(el('div', 'lamp top'));
-    body.appendChild(el('div', 'lamp bottom'));
-    body.appendChild(el('div', 'wheel a'));
-    body.appendChild(el('div', 'wheel b'));
-
-    const sign = el('div', 'sign', GLYPHS[bus.color] || '?');
-    if (rotate) sign.style.transform = `rotate(${-ANGLE[bus.facing]}deg)`;
-    body.appendChild(sign);
+    if (!o.parked) {
+      body.appendChild(el('div', 'screen'));
+      body.appendChild(el('div', 'arrow'));
+      // The colour-blind glyph rides at the tail and counter-rotates so it
+      // stays upright whichever way the bus faces.
+      const sign = el('div', 'sign', GLYPHS[bus.color] || '?');
+      if (o.rotate) sign.style.transform = `rotate(${-ANGLE[bus.facing]}deg)`;
+      body.appendChild(sign);
+    }
 
     const row = el('div', 'seats');
     for (let i = 0; i < bus.capacity; i++) {
@@ -223,8 +288,8 @@
     const ys = bus.cells.map((p) => p[1]);
     const cx = (Math.min(...xs) + Math.max(...xs) + 1) * c / 2;
     const cy = (Math.min(...ys) + Math.max(...ys) + 1) * c / 2;
-    const w = bus.cells.length * c - 7;
-    const h = c - 7;
+    const w = bus.cells.length * c - Math.max(3, Math.round(c * 0.16));
+    const h = c - Math.max(3, Math.round(c * 0.16));
 
     const node = el('button', 'bus');
     node.type = 'button';
@@ -236,7 +301,7 @@
       width: w + 'px', height: h + 'px',
       transform: `rotate(${ANGLE[bus.facing]}deg)`,
     });
-    node.appendChild(busBody(bus, null, true));
+    node.appendChild(busBody(bus, null, { rotate: true }));
     node.addEventListener('click', () => onBusTap(bus.id, node));
     return node;
   }
@@ -244,18 +309,24 @@
   // ---- rendering --------------------------------------------------------- //
 
   function render() {
+    // The tray is laid out first: the lot only gets the height it leaves over.
+    renderQueue();
+    renderBays();
     app.cell = cellSize();
     document.documentElement.style.setProperty('--cell', app.cell + 'px');
-    const remaining = app.level.queue.length - app.queueAt;
-
-    $('#blindNo').textContent = String(app.level.id);
-    $('#blindSub').textContent =
-      `${CHAPTERS[app.level.chapter - 1].name} · ${remaining} von ${app.level.queue.length} warten`;
-
     renderLot();
-    renderBays();
-    renderQueue();
-    $('#undo').disabled = app.history.length === 0 || app.busy;
+
+    const remaining = app.level.queue.length - app.queueAt;
+    $('#levelChip').textContent = `LEVEL ${app.level.id}`;
+    $('#status').textContent =
+      `${CHAPTERS[app.level.chapter - 1].name} · ${remaining}/${app.level.queue.length} warten`
+      + ` · ${app.level.bays} von ${STANDS} Buchten offen`;
+    setDisabled('undo', app.history.length === 0 || app.busy);
+  }
+
+  function setDisabled(act, off) {
+    document.querySelectorAll(`[data-act="${act}"]`)
+      .forEach((n) => { n.disabled = off; });
   }
 
   function renderLot() {
@@ -265,29 +336,6 @@
     lot.innerHTML = '';
     lot.style.width = lvl.width * c + 'px';
     lot.style.height = lvl.height * c + 'px';
-
-    // Lane markings: a solid edge line against each hard shoulder, broken white
-    // lines between lanes, and painted distance markers on the tarmac.
-    for (const [cls, x] of [['edge', 6], ['edge', lvl.width * c - 9]]) {
-      const line = el('div', cls);
-      line.style.left = x + 'px';
-      lot.appendChild(line);
-    }
-    for (let x = 1; x < lvl.width; x++) {
-      const lane = el('div', 'lane');
-      lane.style.left = (x * c - 1) + 'px';
-      lot.appendChild(lane);
-    }
-    lot.appendChild(el('div', 'barrier l'));
-    lot.appendChild(el('div', 'barrier r'));
-
-    for (let k = 1; k * 3 < lvl.height; k++) {
-      const marker = el('div', 'marker', `${k * 100}`);
-      marker.style.fontSize = Math.round(c * 0.44) + 'px';
-      marker.style.left = (lvl.width * c - 14) + 'px';
-      marker.style.top = (k * 3 * c) + 'px';
-      lot.appendChild(marker);
-    }
 
     for (const key of lvl.blocked) {
       const [x, y] = key.split(',').map(Number);
@@ -319,7 +367,9 @@
       node.appendChild(el('span', 'no', String(i + 1)));
       if (bay) {
         const holder = el('div', 'docked');
-        holder.appendChild(busBody(bay.bus, bay.seats, false));
+        // Big enough sockets that a landing ball is unmistakable.
+        holder.appendChild(busBody(bay.bus, bay.seats,
+          { parked: true, seat: bay.bus.capacity > 4 ? 8 : 13 }));
         node.appendChild(holder);
       }
       wrap.appendChild(node);
@@ -327,18 +377,19 @@
   }
 
   /**
-   * The waiting crowd.
+   * The waiting crowd, as one packed board.
    *
-   * Passengers used to stand in a tidy left-to-right line, which meant the
-   * whole future was readable at a glance and the next move was never a
-   * judgement call. They are now scattered across a forecourt: the ones due
-   * next are nearest the stands, the rest mill about further back, smaller and
-   * dimmer with distance.
+   * Every passenger still waiting is on screen - no "12 more behind" caption to
+   * take on trust. They sit in a hexagonal pile that drains from the bottom, so
+   * the front of the queue is always the bottom row and the mass above it is
+   * genuinely hard to read at a glance, which is the point: the pile used to be
+   * a tidy line and the whole future came for free.
    *
-   * The scatter is SEEDED from the level id, not random at runtime. Everyone
-   * playing level 137 sees the same crowd in the same places, the board stays
-   * reproducible, and the solver still answers exactly - which is what the
-   * free rewind depends on. It looks unpredictable; it is not.
+   * The jitter that keeps it from looking like a spreadsheet is SEEDED from the
+   * level id and the passenger's own queue index - never random at runtime.
+   * Everyone playing level 137 sees the same pile, the board stays
+   * reproducible, and the solver still answers exactly, which is what the free
+   * rewind depends on. It looks loose; it is not.
    */
   function renderQueue() {
     const lvl = app.level;
@@ -346,49 +397,41 @@
     wrap.innerHTML = '';
     const remaining = lvl.queue.length - app.queueAt;
 
-    const width = wrap.clientWidth || 340;
-    const shown = Math.min(remaining, MAX_QUEUE_SHOWN);
+    const width = wrap.clientWidth || (Math.min(window.innerWidth, 432) - 36);
+    if (!app.tray || app.tray.width !== width) {
+      app.tray = trayLayout(lvl.queue.length, width,
+                            Math.max(96, Math.min(224, window.innerHeight * 0.28)));
+    }
+    const t = app.tray;
+    wrap.style.height = t.h + 'px';
 
-    for (let k = 0; k < shown; k++) {
+    for (let k = 0; k < remaining; k++) {
       const i = app.queueAt + k;
       const p = lvl.queue[i];
       const rnd = seeded(lvl.id * 7919 + i * 131);
+      const slot = traySlot(k, t);
 
-      const PER_ROW = 5;
-      const row = Math.floor(k / PER_ROW);        // 0 = closest to the stands
-      const depth = Math.min(row, 2);
-      const size = 21 - depth * 2.5;
-
-      // Spread the columns across the whole forecourt, then jitter so the
-      // crowd never looks like a grid.
-      const slot = (k % PER_ROW) + rnd() * 0.8 - 0.4;
-      const x = 6 + (slot / (PER_ROW - 1)) * (width - size - 14);
-      const y = 5 + row * 23 + rnd() * 8;
-
-      const rider = el('div', 'rider' + (i === app.queueAt ? ' next' : ''));
+      const size = Math.round(t.d * 1.04);
+      const rider = el('div', 'rider' + (k === 0 ? ' next' : ''));
       rider.dataset.index = String(i);
       Object.assign(rider.style, {
-        left: Math.max(2, Math.min(width - size - 4, x)) + 'px',
-        top: y + 'px',
-        opacity: String(1 - depth * 0.16),
-        zIndex: String(50 - row),
+        // Just enough jitter to break the grid. More than this and light gaps
+        // open between the balls, and the whole tray reads pastel instead of
+        // like a mass of coloured plastic.
+        left: (slot.left + (t.d - size) / 2 + (rnd() - 0.5) * t.d * 0.06) + 'px',
+        top: (slot.top + (rnd() - 0.5) * t.d * 0.06) + 'px',
+        zIndex: String(200 - slot.row),
       });
       const ball = ballNode(p.color, p.luggage);
       ball.style.width = size + 'px';
       ball.style.height = size + 'px';
-      ball.style.fontSize = Math.round(size * 0.42) + 'px';
+      ball.style.fontSize = Math.round(size * 0.44) + 'px';
       rider.appendChild(ball);
       wrap.appendChild(rider);
     }
 
-    if (remaining === 0) wrap.appendChild(el('span', 'queue-more', 'alle eingestiegen'));
-    $('#queueCount').textContent = remaining > 0
-      ? `${remaining}${remaining > shown ? ` · ${remaining - shown} hinten` : ''}`
-      : 'leer';
-    // Keep the blind in step during boarding, not just at the end of the move.
-    $('#blindSub').textContent =
-      `${CHAPTERS[lvl.chapter - 1].name} · ${remaining}/${lvl.queue.length}`
-      + ` · ${lvl.bays}/${STANDS}`;
+    if (remaining === 0) wrap.appendChild(el('div', 'tray-empty', 'alle eingestiegen'));
+    $('#queueCount').textContent = String(remaining);
   }
 
   /** Tiny deterministic PRNG, so the crowd looks scattered but never shifts. */
@@ -476,7 +519,7 @@
     app.busy = true;
     app.history.push(app.state);
     hideBanner();
-    $('#undo').disabled = true;
+    setDisabled('undo', true);
 
     const bus = app.level.byId.get(busId);
     const events = [];
@@ -786,34 +829,25 @@
 
   // ---- boot -------------------------------------------------------------- //
 
-  /** Verges either side of the app: the motorway continues past the board. */
-  function buildBackdrop() {
-    const back = el('div', 'backdrop');
-    for (const side of ['l', 'r']) {
-      const verge = el('div', 'verge ' + side);
-      for (let i = 0; i < 5; i++) {
-        const car = el('div', 'traffic');
-        Object.assign(car.style, {
-          left: (10 + (i % 2) * 24) + 'px',
-          background: ['#8A8F86', '#6E7A86', '#7D7169', '#93887A'][i % 4],
-          animationDuration: (9 + i * 2.4) + 's',
-          animationDelay: (-i * 3.1) + 's',
-          animationDirection: side === 'l' ? 'normal' : 'reverse',
-        });
-        verge.appendChild(car);
-      }
-      back.appendChild(verge);
-    }
-    document.body.insertBefore(back, document.body.firstChild);
-  }
+  // Two controls appear twice - undo in the floating HUD and again in the dock,
+  // as in the reference - so they are wired by intent rather than by id.
+  const ACTIONS = {
+    hint: doHint,
+    undo: undo,
+    restart: () => loadLevel(app.level.id),
+    map: showMap,
+  };
 
   function boot() {
-    buildBackdrop();
-    $('#hint').addEventListener('click', doHint);
-    $('#undo').addEventListener('click', undo);
-    $('#restart').addEventListener('click', () => loadLevel(app.level.id));
-    $('#pick').addEventListener('click', showMap);
-    window.addEventListener('resize', () => { if (app.level && !app.busy) render(); });
+    document.querySelectorAll('[data-act]').forEach((node) => {
+      const act = ACTIONS[node.dataset.act];
+      if (act) node.addEventListener('click', act);
+    });
+    window.addEventListener('resize', () => {
+      if (!app.level || app.busy) return;
+      app.tray = null;                   // re-pack the pile for the new width
+      render();
+    });
     loadLevel(load().current || 1);
   }
 

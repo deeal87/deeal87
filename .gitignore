@@ -15,7 +15,8 @@
 *.unitypackage
 sysinfo.txt
 
-# Build output from tools/check.sh
+# Build output from tools/check.sh and tools/webpreview/build.py
+tools/webpreview/sunny-stop.html
 *.dll
 *.exe
 *.mdb

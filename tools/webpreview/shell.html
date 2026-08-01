@@ -4,39 +4,52 @@
 </style>
 
 <div class="app">
-  <header class="blind">
-    <span class="blind-no" id="blindNo">1</span>
-    <div class="blind-text">
-      <p class="blind-dest">Sunny Stop</p>
-      <p class="blind-sub" id="blindSub"></p>
-    </div>
-    <button class="blind-pick" id="pick" type="button">KARTE</button>
-  </header>
-
-  <div class="stage">
-    <div class="lot" id="lot"></div>
-    <div class="bays" id="bays"></div>
-    <div class="platform">
-      <span class="platform-label">
-        <span>Vorplatz</span>
-        <span id="queueCount"></span>
-      </span>
-      <div class="queue" id="queue"></div>
+  <!-- Floating HUD, laid over the top of the ball tray. -->
+  <div class="hud">
+    <button class="chip ico" data-act="map" type="button" aria-label="Karte">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2zm0 2.2 6 2v13.6l-6-2V5.2z"/></svg>
+    </button>
+    <button class="chip ico" data-act="undo" id="undo" type="button" aria-label="Zug zurücknehmen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg>
+    </button>
+    <div class="chip level" id="levelChip">LEVEL 1</div>
+    <div class="chip count">
+      <span class="pip" aria-hidden="true"></span>
+      <span id="queueCount">0</span>
     </div>
   </div>
+
+  <!-- The waiting crowd: one board, packed edge to edge. -->
+  <div class="tray" id="tray">
+    <div class="tray-inner" id="queue"></div>
+  </div>
+
+  <!-- The stands. -->
+  <div class="bays" id="bays"></div>
+
+  <div class="grip" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <!-- The lot: every bus points the way it will leave. -->
+  <div class="lotwrap"><div class="lot" id="lot"></div></div>
 
   <div class="banner" id="banner" hidden></div>
 
-  <div class="controls">
-    <button class="btn warm" id="hint" type="button">Hinweis</button>
-    <button class="btn" id="undo" type="button">Zurück</button>
-    <button class="btn" id="restart" type="button">Neu</button>
+  <div class="dock">
+    <button class="pad gold" data-act="hint" id="hint" type="button">
+      <span class="pad-ico" aria-hidden="true">💡</span><span class="pad-cap">TIPP</span>
+    </button>
+    <button class="pad steel" data-act="undo" type="button">
+      <span class="pad-ico" aria-hidden="true">↺</span><span class="pad-cap">ZURÜCK</span>
+    </button>
+    <button class="pad steel" data-act="restart" type="button">
+      <span class="pad-ico" aria-hidden="true">⟳</span><span class="pad-cap">NEU</span>
+    </button>
+    <button class="pad plum" data-act="map" type="button">
+      <span class="pad-ico" aria-hidden="true">🗺</span><span class="pad-cap">KARTE</span>
+    </button>
   </div>
 
-  <p class="hint-note">
-    Tippe einen Bus an. Er fährt geradeaus los und dockt in der linken freien Bucht an —
-    dann rollen die Bälle vom Bahnsteig auf die Sitze. Nur farbgleiche, und immer nur der Vorderste.
-  </p>
+  <p class="hint-note" id="status"></p>
 </div>
 
 <script>
