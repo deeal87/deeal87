@@ -338,17 +338,35 @@ html { -webkit-text-size-adjust: 100%; }
 }
 .platform-label > span:first-child { overflow: hidden; text-overflow: ellipsis; }
 .platform-label > span:last-child { flex: 0 0 auto; color: var(--accent); }
+/* The forecourt: a scattered crowd rather than a readable line. */
 .queue {
-  display: flex; gap: 5px; align-items: center;
-  overflow-x: auto; padding: 3px 2px 5px;
-  scrollbar-width: thin;
+  position: relative;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 4px;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(0,0,0,.05), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.035) 0 1px, transparent 1px 26px);
 }
-.rider { position: relative; flex: 0 0 auto; transition: transform 200ms ease, opacity 200ms ease; }
-.rider.head::after {
-  content: ""; position: absolute; inset: -4px;
+.rider {
+  position: absolute;
+  transition: left 260ms ease, top 260ms ease, opacity 200ms ease;
+  animation: dropIn 300ms cubic-bezier(.3,1.4,.5,1) backwards;
+}
+@keyframes dropIn {
+  from { transform: translateY(16px) scale(.5); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+/* The one boarding next. Marked, but quietly - you have to look for it. */
+.rider.next::after {
+  content: ""; position: absolute; inset: -3px;
   border: 2px solid var(--accent); border-radius: 50%;
+  animation: breathe 1.8s ease-in-out infinite;
 }
-.rider.head { transform: scale(1.12); }
+@keyframes breathe {
+  0%, 100% { opacity: .45; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.12); }
+}
 
 /* the ball itself - used in the queue, in flight and inside the bus */
 .ball {
@@ -370,7 +388,10 @@ html { -webkit-text-size-adjust: 100%; }
   transition: transform 380ms cubic-bezier(.34, .8, .4, 1);
   will-change: transform;
 }
-.queue-more { font-family: var(--data); font-size: 0.7rem; color: var(--muted); padding-left: 3px; }
+.queue-more {
+  position: absolute; right: 6px; bottom: 4px;
+  font-family: var(--data); font-size: 0.62rem; color: var(--muted);
+}
 
 /* ---- controls ---- */
 

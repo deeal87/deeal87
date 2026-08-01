@@ -61,8 +61,9 @@ free-to-play.
 ├─────────────────────────────────────┤
 │  ▣1 ▣2 ▣3 ▣4 ▨5 ▨6                  │   Six numbered stands, 3–4 in service.
 ├─────────────────────────────────────┤
-│  ● ● ● ● ● ● ● ● ● ● …              │   Passenger queue, moves left→right.
-└─────────────────────────────────────┘   Only the front passengers can board.
+│   ●   ●     ●    ●   ●   ●          │   Forecourt: a scattered crowd, not
+│     ●    ●     ●    ●      ●        │   a line. One is marked as next.
+└─────────────────────────────────────┘   Only that one can board.
 ```
 
 ### 3.2 Rules
@@ -72,10 +73,17 @@ free-to-play.
    (clear feedback, no wasted move).
 2. A dispatched bus **pulls into the leftmost free bay**. If no bay is free, the tap is
    refused. Bays are the scarce resource; that is where the game lives.
-3. **Boarding is automatic.** Passengers at the head of the queue board any bay whose bus
-   matches their colour, one at a time, with a small satisfying hop. The queue only moves
-   forward — a green passenger at the front blocks the blue behind them until a green bus
+3. **Boarding is automatic.** The passenger currently at the head boards any stand whose
+   bus matches their colour, rolling out of the crowd and into a seat. The order only moves
+   forward — a green passenger at the head blocks the blue behind them until a green bus
    is docked.
+
+   Presentationally the crowd is **scattered across a forecourt, not queued in a line**.
+   A tidy left-to-right queue let the player read the entire future at a glance, so the
+   next move was never a judgement call. The scatter is *seeded from the level id*, so it
+   is identical for every player and on every replay — the board stays reproducible and
+   the solver still answers exactly, which is what the free rewind depends on. It looks
+   unpredictable; it is not, and it must never become so (§5.1).
 4. A bus **departs when full** (capacity 3 standard, 6 double-decker), freeing its bay.
    A bus that is not full stays docked.
 5. **Win:** the queue is empty.

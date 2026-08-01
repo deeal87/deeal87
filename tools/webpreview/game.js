@@ -41,7 +41,7 @@
     { name: 'Morgengrauen', tint: 'rgba(246, 197, 150, .34)' },
   ];
 
-  const MAX_QUEUE_SHOWN = 12;
+  const MAX_QUEUE_SHOWN = 15;
   const STORE = 'sunnystop.preview';
 
   const $ = (s) => document.querySelector(s);
@@ -326,28 +326,78 @@
     }
   }
 
+  /**
+   * The waiting crowd.
+   *
+   * Passengers used to stand in a tidy left-to-right line, which meant the
+   * whole future was readable at a glance and the next move was never a
+   * judgement call. They are now scattered across a forecourt: the ones due
+   * next are nearest the stands, the rest mill about further back, smaller and
+   * dimmer with distance.
+   *
+   * The scatter is SEEDED from the level id, not random at runtime. Everyone
+   * playing level 137 sees the same crowd in the same places, the board stays
+   * reproducible, and the solver still answers exactly - which is what the
+   * free rewind depends on. It looks unpredictable; it is not.
+   */
   function renderQueue() {
     const lvl = app.level;
     const wrap = $('#queue');
     wrap.innerHTML = '';
     const remaining = lvl.queue.length - app.queueAt;
 
-    for (let i = app.queueAt; i < Math.min(lvl.queue.length, app.queueAt + MAX_QUEUE_SHOWN); i++) {
+    const width = wrap.clientWidth || 340;
+    const shown = Math.min(remaining, MAX_QUEUE_SHOWN);
+
+    for (let k = 0; k < shown; k++) {
+      const i = app.queueAt + k;
       const p = lvl.queue[i];
-      const rider = el('div', 'rider' + (i === app.queueAt ? ' head' : ''));
+      const rnd = seeded(lvl.id * 7919 + i * 131);
+
+      const PER_ROW = 5;
+      const row = Math.floor(k / PER_ROW);        // 0 = closest to the stands
+      const depth = Math.min(row, 2);
+      const size = 21 - depth * 2.5;
+
+      // Spread the columns across the whole forecourt, then jitter so the
+      // crowd never looks like a grid.
+      const slot = (k % PER_ROW) + rnd() * 0.8 - 0.4;
+      const x = 6 + (slot / (PER_ROW - 1)) * (width - size - 14);
+      const y = 5 + row * 23 + rnd() * 8;
+
+      const rider = el('div', 'rider' + (i === app.queueAt ? ' next' : ''));
       rider.dataset.index = String(i);
-      rider.appendChild(ballNode(p.color, p.luggage));
+      Object.assign(rider.style, {
+        left: Math.max(2, Math.min(width - size - 4, x)) + 'px',
+        top: y + 'px',
+        opacity: String(1 - depth * 0.16),
+        zIndex: String(50 - row),
+      });
+      const ball = ballNode(p.color, p.luggage);
+      ball.style.width = size + 'px';
+      ball.style.height = size + 'px';
+      ball.style.fontSize = Math.round(size * 0.42) + 'px';
+      rider.appendChild(ball);
       wrap.appendChild(rider);
     }
-    if (remaining > MAX_QUEUE_SHOWN) {
-      wrap.appendChild(el('span', 'queue-more', `+${remaining - MAX_QUEUE_SHOWN}`));
-    }
+
     if (remaining === 0) wrap.appendChild(el('span', 'queue-more', 'alle eingestiegen'));
-    $('#queueCount').textContent = remaining > 0 ? `${remaining} wartend` : 'leer';
+    $('#queueCount').textContent = remaining > 0
+      ? `${remaining}${remaining > shown ? ` · ${remaining - shown} hinten` : ''}`
+      : 'leer';
     // Keep the blind in step during boarding, not just at the end of the move.
     $('#blindSub').textContent =
       `${CHAPTERS[lvl.chapter - 1].name} · ${remaining}/${lvl.queue.length}`
       + ` · ${lvl.bays}/${STANDS}`;
+  }
+
+  /** Tiny deterministic PRNG, so the crowd looks scattered but never shifts. */
+  function seeded(seed) {
+    let s = seed >>> 0;
+    return () => {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
   }
 
   // ---- the boarding flight ----------------------------------------------- //
