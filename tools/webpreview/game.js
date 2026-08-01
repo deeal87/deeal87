@@ -118,6 +118,7 @@
     // at a time, while the engine has already resolved the whole cascade.
     bays: [],
     queueAt: 0,
+    pending: null,
   };
 
   const levelData = (n) => DATA.levels.find((l) => l.id === n);
@@ -372,11 +373,11 @@
     // A little hop on the way in - the arc is what makes it feel cheerful.
     const dx = to.left + (to.width - from.width) / 2 - from.left;
     const dy = to.top + (to.height - from.height) / 2 - from.top;
-    await sleep(20);
-    flyer.style.transform = `translate(${dx * 0.55}px, ${dy - 26}px) scale(1.1)`;
-    await sleep(190);
+    await sleep(16);
+    flyer.style.transform = `translate(${dx * 0.55}px, ${dy - 22}px) scale(1.08)`;
+    await sleep(110);
     flyer.style.transform = `translate(${dx}px, ${dy}px) scale(${to.width / from.width})`;
-    await sleep(200);
+    await sleep(120);
 
     flyer.remove();
     app.bays[bayIndex].seats[seatIndex] = { color: passenger.color };
@@ -401,7 +402,13 @@
   // ---- interaction ------------------------------------------------------- //
 
   function onBusTap(busId, node) {
-    if (app.busy || app.done) return;
+    if (app.done) return;
+    if (app.busy) {
+      // Queue the tap rather than swallowing it: during a long boarding cascade
+      // an ignored tap just feels like the game is broken.
+      app.pending = busId;
+      return;
+    }
     const refusal = E.canDispatch(app.level, app.state, busId);
     if (refusal) {
       node.classList.remove('refused');
@@ -457,6 +464,14 @@
     app.busy = false;
     render();
     afterMove();
+
+    // Play back a tap made while the balls were still boarding.
+    const queued = app.pending;
+    app.pending = null;
+    if (queued != null && !app.done) {
+      const next = document.querySelector(`.bus[data-bus="${queued}"]`);
+      if (next && !E.canDispatch(app.level, app.state, queued)) doMove(queued, next);
+    }
   }
 
   function afterMove() {

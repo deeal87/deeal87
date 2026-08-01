@@ -403,6 +403,10 @@ html { -webkit-text-size-adjust: 100%; }
 
 .postcard-layer {
   position: fixed; inset: 0; background: var(--ground);
+  /* Appended to <body>, outside .app - so the ink colour has to be set here or
+     the text falls back to the browser default black, which is unreadable on
+     the dark card. */
+  color: var(--ink);
   display: grid; place-items: center; padding: 1.25rem; z-index: 50;
   animation: fade 280ms ease;
 }
@@ -416,7 +420,10 @@ html { -webkit-text-size-adjust: 100%; }
   animation: rise 340ms cubic-bezier(.2, .8, .3, 1);
 }
 @keyframes rise { from { transform: translateY(14px) scale(.96); } to { transform: none; } }
-.postcard q { font-size: 1.25rem; line-height: 1.45; quotes: "„" "“"; }
+.postcard q {
+  font-size: 1.3rem; line-height: 1.5; quotes: "„" "“";
+  color: var(--ink);
+}
 .postcard .meta {
   font-family: var(--data); font-size: 0.66rem; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--muted);
@@ -428,6 +435,7 @@ html { -webkit-text-size-adjust: 100%; }
 .map-layer {
   position: fixed; inset: 0; z-index: 60;
   background: var(--ground);
+  color: var(--ink);
   overflow-y: auto; overscroll-behavior: contain;
 }
 .map-head {

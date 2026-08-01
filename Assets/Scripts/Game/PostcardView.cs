@@ -58,8 +58,11 @@ namespace SunnyStop.Game
             UiBuilder.Place(accent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                             Vector2.zero, new Vector2(860f, 18f));
 
+            // Explicit ink, never inherited. The browser preview had exactly this
+            // bug: the win screen sat outside the themed container, fell back to
+            // the default black, and became unreadable on a dark card.
             _message = UiBuilder.Label(_card, "Message", "", 52,
-                                       new Color(0.24f, 0.21f, 0.18f));
+                                       new Color(0.16f, 0.17f, 0.13f));
             UiBuilder.Place(_message.rectTransform, new Vector2(0.5f, 0.5f),
                             new Vector2(0.5f, 0.5f), new Vector2(0f, 40f),
                             new Vector2(740f, 420f));
