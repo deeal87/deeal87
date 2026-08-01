@@ -168,8 +168,10 @@
   }
 
   function cellSize() {
-    const avail = Math.min(window.innerWidth - 26, 470);
-    return Math.max(26, Math.min(54, Math.floor(avail / app.level.width)));
+    const avail = Math.min(window.innerWidth - 14, 520);
+    // Late boards are 9x10, so cells have to be small enough for the widest one
+    // to fit a phone without scrolling.
+    return Math.max(20, Math.min(46, Math.floor(avail / app.level.width)));
   }
 
   // ---- pieces ------------------------------------------------------------ //
@@ -263,15 +265,27 @@
     lot.style.width = lvl.width * c + 'px';
     lot.style.height = lvl.height * c + 'px';
 
-    for (let y = 0; y < lvl.height; y++) {
-      for (let x = 0; x < lvl.width; x++) {
-        const slot = el('div', 'slot');
-        Object.assign(slot.style, {
-          left: x * c + 3 + 'px', top: y * c + 4 + 'px',
-          width: c - 6 + 'px', height: c - 8 + 'px',
-        });
-        lot.appendChild(slot);
-      }
+    // Lane markings: a solid edge line against each hard shoulder, broken white
+    // lines between lanes, and painted distance markers on the tarmac.
+    for (const [cls, x] of [['edge', 6], ['edge', lvl.width * c - 9]]) {
+      const line = el('div', cls);
+      line.style.left = x + 'px';
+      lot.appendChild(line);
+    }
+    for (let x = 1; x < lvl.width; x++) {
+      const lane = el('div', 'lane');
+      lane.style.left = (x * c - 1) + 'px';
+      lot.appendChild(lane);
+    }
+    lot.appendChild(el('div', 'barrier l'));
+    lot.appendChild(el('div', 'barrier r'));
+
+    for (let k = 1; k * 3 < lvl.height; k++) {
+      const marker = el('div', 'marker', `${k * 100}`);
+      marker.style.fontSize = Math.round(c * 0.44) + 'px';
+      marker.style.left = (lvl.width * c - 14) + 'px';
+      marker.style.top = (k * 3 * c) + 'px';
+      lot.appendChild(marker);
     }
 
     for (const key of lvl.blocked) {
@@ -290,19 +304,25 @@
     }
   }
 
+  const STANDS = 6;   // the terminal always shows six numbered stands
+
   function renderBays() {
     const wrap = $('#bays');
     wrap.innerHTML = '';
-    app.bays.forEach((bay, i) => {
-      const node = el('div', 'bay' + (bay ? '' : ' free'));
+    for (let i = 0; i < STANDS; i++) {
+      const inService = i < app.bays.length;
+      const bay = inService ? app.bays[i] : null;
+      const node = el('div', 'bay'
+        + (!inService ? ' closed' : (bay ? '' : ' free')));
       node.dataset.bay = String(i);
+      node.appendChild(el('span', 'no', String(i + 1)));
       if (bay) {
         const holder = el('div', 'docked');
         holder.appendChild(busBody(bay.bus, bay.seats, false));
         node.appendChild(holder);
       }
       wrap.appendChild(node);
-    });
+    }
   }
 
   function renderQueue() {
@@ -325,7 +345,8 @@
     $('#queueCount').textContent = remaining > 0 ? `${remaining} wartend` : 'leer';
     // Keep the blind in step during boarding, not just at the end of the move.
     $('#blindSub').textContent =
-      `${CHAPTERS[lvl.chapter - 1].name} · ${remaining} von ${lvl.queue.length} warten`;
+      `${CHAPTERS[lvl.chapter - 1].name} · ${remaining}/${lvl.queue.length}`
+      + ` · ${lvl.bays}/${STANDS}`;
   }
 
   // ---- the boarding flight ----------------------------------------------- //
@@ -700,7 +721,29 @@
 
   // ---- boot -------------------------------------------------------------- //
 
+  /** Verges either side of the app: the motorway continues past the board. */
+  function buildBackdrop() {
+    const back = el('div', 'backdrop');
+    for (const side of ['l', 'r']) {
+      const verge = el('div', 'verge ' + side);
+      for (let i = 0; i < 5; i++) {
+        const car = el('div', 'traffic');
+        Object.assign(car.style, {
+          left: (10 + (i % 2) * 24) + 'px',
+          background: ['#8A8F86', '#6E7A86', '#7D7169', '#93887A'][i % 4],
+          animationDuration: (9 + i * 2.4) + 's',
+          animationDelay: (-i * 3.1) + 's',
+          animationDirection: side === 'l' ? 'normal' : 'reverse',
+        });
+        verge.appendChild(car);
+      }
+      back.appendChild(verge);
+    }
+    document.body.insertBefore(back, document.body.firstChild);
+  }
+
   function boot() {
+    buildBackdrop();
     $('#hint').addEventListener('click', doHint);
     $('#undo').addEventListener('click', undo);
     $('#restart').addEventListener('click', () => loadLevel(app.level.id));

@@ -288,10 +288,16 @@ def generate_candidate(rng: random.Random, p: GenParams) -> Level:
     return level
 
 
+# A candidate that blows past this is one the on-device solver could not answer
+# instantly either, so the cap is a playability gate rather than just a
+# generation budget: it keeps the free-rewind check imperceptible.
+STATE_CAP = 60_000
+
+
 def generate_level(
     n: int,
     seed: int,
-    attempts: int = 260,
+    attempts: Optional[int] = None,
     tolerance: float = 2.5,
 ) -> tuple[Level, Analysis]:
     """Generate candidates and keep the one closest to the target curve."""
@@ -299,11 +305,16 @@ def generate_level(
     p = params_for(n)
     target = target_mds(n)
 
+    if attempts is None:
+        # Late boards cost orders of magnitude more to analyse, and they sit near
+        # the ceiling anyway, so the first viable candidates are already close.
+        attempts = 260 if n < 90 else (90 if n < 150 else 45)
+
     best: Optional[tuple[float, Level, Analysis]] = None
     for _ in range(attempts):
         try:
             level = generate_candidate(rng, p)
-            analysis = analyse(level)
+            analysis = analyse(level, state_cap=STATE_CAP)
         except (GenerationFailure, RuntimeError):
             continue
         if not analysis.solvable:  # pragma: no cover - impossible by construction

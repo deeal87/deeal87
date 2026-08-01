@@ -8,25 +8,25 @@
   },
   "bays": 3,
   "colors": [
-    "green",
     "red",
+    "green",
     "blue"
   ],
   "buses": [
     {
       "id": 1,
-      "color": "green",
+      "color": "red",
       "cells": [
         [
-          3,
-          4
+          0,
+          2
         ],
         [
-          3,
-          5
+          0,
+          3
         ]
       ],
-      "facing": "down",
+      "facing": "up",
       "capacity": 3
     },
     {
@@ -34,20 +34,20 @@
       "color": "red",
       "cells": [
         [
-          0,
-          3
+          2,
+          0
         ],
         [
-          0,
-          4
+          2,
+          1
         ]
       ],
-      "facing": "up",
+      "facing": "down",
       "capacity": 3
     },
     {
       "id": 3,
-      "color": "red",
+      "color": "green",
       "cells": [
         [
           1,
@@ -58,7 +58,7 @@
           4
         ]
       ],
-      "facing": "down",
+      "facing": "up",
       "capacity": 3
     },
     {
@@ -67,30 +67,30 @@
       "cells": [
         [
           1,
-          1
+          5
         ],
         [
-          1,
-          2
+          2,
+          5
         ]
       ],
-      "facing": "up",
+      "facing": "left",
       "capacity": 3
     },
     {
       "id": 5,
-      "color": "red",
+      "color": "green",
       "cells": [
         [
-          4,
-          0
+          3,
+          3
         ],
         [
-          5,
-          0
+          4,
+          3
         ]
       ],
-      "facing": "left",
+      "facing": "right",
       "capacity": 3
     },
     {
@@ -98,12 +98,12 @@
       "color": "green",
       "cells": [
         [
-          2,
-          0
+          3,
+          4
         ],
         [
-          3,
-          0
+          4,
+          4
         ]
       ],
       "facing": "left",
@@ -114,27 +114,69 @@
       "color": "red",
       "cells": [
         [
-          5,
-          2
+          4,
+          1
         ],
         [
           5,
-          3
+          1
         ]
       ],
-      "facing": "down",
+      "facing": "right",
+      "capacity": 3
+    },
+    {
+      "id": 8,
+      "color": "green",
+      "cells": [
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "facing": "right",
       "capacity": 3
     }
   ],
   "blocked": [
     [
-      2,
-      3
+      3,
+      5
     ]
   ],
   "queue": [
     {
+      "color": "green",
+      "luggage": true
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green",
+      "luggage": true
+    },
+    {
       "color": "red"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "red",
@@ -144,12 +186,6 @@
       "color": "green"
     },
     {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
       "color": "green"
     },
     {
@@ -157,53 +193,39 @@
     },
     {
       "color": "red"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "green"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "green"
     },
     {
       "color": "green"
     },
     {
       "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     }
   ],
   "analysis": {
-    "optimal": 6,
-    "states": 383,
-    "solutionDensity": 0.7779,
-    "trapDepth": 3,
-    "forcedRatio": 0.026,
-    "deception": 0.118,
+    "optimal": 7,
+    "states": 453,
+    "solutionDensity": 0.6965,
+    "trapDepth": 2,
+    "forcedRatio": 0.0269,
+    "deception": 0.009,
     "deceptionMax": 1,
-    "deadEnds": 136,
-    "raw": 0.8994,
-    "mds": 14.3
+    "deadEnds": 225,
+    "raw": 0.9391,
+    "mds": 15.8
   },
   "solution": [
     1,
-    2,
     3,
     4,
+    5,
     6,
-    5
+    7,
+    8
   ]
 }

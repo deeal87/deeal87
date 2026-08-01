@@ -17,12 +17,12 @@
       "color": "blue",
       "cells": [
         [
-          4,
-          0
+          2,
+          2
         ],
         [
-          4,
-          1
+          2,
+          3
         ]
       ],
       "facing": "down",
@@ -30,15 +30,15 @@
     },
     {
       "id": 2,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          3,
-          1
+          4,
+          0
         ],
         [
-          3,
-          2
+          4,
+          1
         ]
       ],
       "facing": "down",
@@ -49,11 +49,11 @@
       "color": "blue",
       "cells": [
         [
-          2,
+          1,
           0
         ],
         [
-          3,
+          2,
           0
         ]
       ],
@@ -65,12 +65,12 @@
       "color": "red",
       "cells": [
         [
-          1,
-          2
+          3,
+          3
         ],
         [
-          1,
-          3
+          3,
+          4
         ]
       ],
       "facing": "up",
@@ -82,21 +82,37 @@
       "cells": [
         [
           0,
-          0
+          1
         ],
         [
           0,
-          1
+          2
         ]
       ],
-      "facing": "down",
+      "facing": "up",
+      "capacity": 3
+    },
+    {
+      "id": 6,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          3
+        ],
+        [
+          1,
+          4
+        ]
+      ],
+      "facing": "up",
       "capacity": 3
     }
   ],
   "blocked": [
     [
-      1,
-      4
+      3,
+      5
     ]
   ],
   "queue": [
@@ -113,7 +129,16 @@
       "color": "red"
     },
     {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
       "color": "blue"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "blue"
@@ -128,30 +153,31 @@
       "color": "blue"
     },
     {
-      "color": "blue"
-    },
-    {
-      "color": "blue"
-    },
-    {
       "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     }
   ],
   "analysis": {
-    "optimal": 4,
-    "states": 50,
-    "solutionDensity": 0.8286,
+    "optimal": 5,
+    "states": 138,
+    "solutionDensity": 0.8384,
     "trapDepth": 4,
-    "forcedRatio": 0.0571,
+    "forcedRatio": 0.0404,
     "deception": 0.0,
     "deceptionMax": 0,
-    "deadEnds": 12,
-    "raw": 0.7321,
-    "mds": 9.4
+    "deadEnds": 36,
+    "raw": 0.763,
+    "mds": 10.2
   },
   "solution": [
     1,
     2,
+    3,
     4,
     5
   ]

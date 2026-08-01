@@ -79,16 +79,28 @@ def params_for(n: int) -> GenParams:
     # Both ramps are deliberately slow early and steep late: the generator's
     # difficulty responds sharply to the first few extra buses and colours, so
     # a linear ramp overshoots the gentle opening of the target curve.
-    buses = 3 + round(12 * t)
+    buses = 3 + round(17 * t)
     colors = min(len(PALETTE), 2 + n // 30)
 
-    # Grid grows just fast enough to keep the lot congested but placeable.
-    width = min(7, 5 + (n > 30) + (n > 90))
-    height = min(8, 5 + (n > 20) + (n > 60) + (n > 130))
+    # The lot is a stretch of motorway, and it widens as the game goes on. Cells
+    # are drawn smaller so a 9x10 board still fits a phone screen.
+    width = min(9, 5 + (n > 25) + (n > 60) + (n > 105) + (n > 155))
+    height = min(10, 5 + (n > 20) + (n > 50) + (n > 90) + (n > 135) + (n > 175))
 
-    # Two bays instead of three is the single hardest knob in the game and is
-    # held back until chapter 6 (CONCEPT.md §4).
-    bays = 2 if n >= 126 else 3
+    # Open stands. The terminal always shows six numbered stands; this is how
+    # many are in service. Counter-intuitively, MORE open stands is more
+    # forgiving, not less - a bigger buffer absorbs more mistakes (findings §5,
+    # §15) - so this ramps up only alongside much bigger boards, and stops at
+    # five: at six the reachable state space blows past the point where the
+    # on-device solver can answer "is this still winnable?" instantly, and that
+    # answer is what the free rewind depends on.
+    # Four open stands is the ceiling, and it is a measured one. At five the
+    # reachable state space runs past 100k, and the on-device solver answers
+    # "is this still winnable?" after EVERY move - at that size the free rewind
+    # visibly stalls, and that rewind is the whole anti-frustration promise.
+    # Difficulty comes from board size, bus count, colours and surplus instead,
+    # all of which are cheap to search.
+    bays = 4 if n >= 50 else 3
 
     blocked = 0 if n < 21 else min(6, 1 + (n - 21) // 26)
 
@@ -100,7 +112,16 @@ def params_for(n: int) -> GenParams:
     # Surplus buses: the mechanic that lets a mistake stay hidden (see
     # docs/PROTOTYPE_FINDINGS.md). Introduced early because without it the game
     # can only punish instantly, never deceive.
-    decoys = 0 if n < 22 else min(4, 1 + (n - 22) // 45)
+    decoys = 0 if n < 22 else min(5, 1 + (n - 22) // 38)
+
+    # A breather level has a much lower target, and past level ~100 the normal
+    # parameter set simply cannot build a board that easy - the easiest of 300
+    # candidates still came out 14 points too hard. So a breather gets a
+    # genuinely smaller board, not just a smaller target.
+    if n % 10 == 0 and n % 25 != 0:
+        buses = max(3, round(buses * 0.62))
+        decoys = max(0, decoys - 2)
+        blocked = max(0, blocked - 2)
 
     chapter = min(8, (n - 1) // 25 + 1)
     return GenParams(n, width, height, bays, buses, colors, blocked, chapter,

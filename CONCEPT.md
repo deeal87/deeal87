@@ -54,12 +54,12 @@ free-to-play.
 
 ```
 ┌─────────────────────────────────────┐
-│   PARKING LOT (grid, 5×5 → 8×9)     │   Buses, each with a colour and a
+│   MOTORWAY (grid, 5×5 → 9×10)       │   Buses, each with a colour and a
 │   ┌──┐ ┌────┐ ┌──┐                  │   facing direction. A bus occupies
 │   │▲R│ │ ◀B │ │▲G│  ← buses         │   1×2 or 1×3 cells.
 │   └──┘ └────┘ └──┘                  │
 ├─────────────────────────────────────┤
-│   ▣ BAY 1   ▣ BAY 2   ▣ BAY 3       │   2–3 docking bays. The bottleneck.
+│  ▣1 ▣2 ▣3 ▣4 ▨5 ▨6                  │   Six numbered stands, 3–4 in service.
 ├─────────────────────────────────────┤
 │  ● ● ● ● ● ● ● ● ● ● …              │   Passenger queue, moves left→right.
 └─────────────────────────────────────┘   Only the front passengers can board.
@@ -122,7 +122,7 @@ the rule without also fighting the difficulty, then combined with everything bef
 | 81–95 | **Garage buses** — colour hidden until adjacent bus leaves | Managed risk / probability |
 | 96–110 | **Double-deckers** — capacity 6, occupy 1×3 | Bay commitment becomes expensive |
 | 111–125 | **Traffic lights** — toggle a lane open/closed every N moves | Timing layer |
-| 126–140 | **Only 2 bays** | A change of feel: tight and tense. Measured *easier* than 3 bays, so the surrounding parameters compensate (see findings §5) |
+| 126–140 | **A fourth stand opens** | More open stands is *more forgiving*, not less (findings §5), so this arrives alongside much bigger boards. Four is the ceiling — at five the on-device solver can no longer answer instantly, and the free rewind depends on it (findings §16) |
 | 141–155 | **VIP passengers** — must board within N moves | Soft urgency, no real-time timer |
 | 156–170 | **Tunnels** — bus exits one side, re-enters another | Spatial re-think |
 | 171–190 | Full combination, "expert dispatch" boards | Mastery |
@@ -487,8 +487,10 @@ valuable piece of infrastructure in the project.
 
 ## 10. Art & audio direction
 
-**Look:** soft 3D on a tilted board (think a toy diorama), rounded low-poly buses with
-thick friendly proportions, warm sunlight, long soft shadows. Cosy, not corporate. For 1.0
+**Look:** the board is a **stretch of motorway seen from above** — asphalt, broken lane
+markings, a hard shoulder and a crash barrier down each side, with distance markers
+painted on the tarmac. The traffic continues past the board down both verges. Buses are
+rounded and friendly with thick proportions, warm sunlight, long soft shadows. Cosy, not corporate. For 1.0
 this is built from a single free low-poly kit rather than commissioned models (§13) — the
 coherence comes from lighting, palette and camera, which cost nothing and carry most of
 the look anyway. The

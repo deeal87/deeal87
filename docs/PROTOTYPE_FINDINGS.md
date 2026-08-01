@@ -163,6 +163,55 @@ just a cone that only some buses can cross. Both are worth having for *variety*
 and readability; neither will move difficulty. They were deferred for that
 reason.
 
+## 15. More open stands is more forgiving, not harder
+
+Asked to make the terminal busier with six bus lines, the obvious reading is that six
+stands is harder than three. Measured, it is the opposite:
+
+| Open stands | raw | solution density | reachable states |
+|---:|---:|---:|---:|
+| 3 | 1.257 | 0.48 | 1 343 |
+| 4 | 1.275 | 0.52 | 5 851 |
+| 5 | 1.487 | 0.52 | 64 565 |
+| 6 | 1.468 | 0.57 | 142 154 |
+
+A stand is buffer. More buffer absorbs more mistakes: at level 60 with six stands the
+density reaches 0.91 and the board becomes almost unlosable. This is the same lesson as
+finding 5 seen from the other side.
+
+So the terminal now shows **six numbered stands, with three or four in service** — the
+look of a real bus station, while difficulty comes from board size, bus count, colours
+and surplus, which do scale the right way.
+
+## 16. The solver budget is a design constraint, not an implementation detail
+
+Five open stands reach ~100k reachable states and six exceed 140k. That matters twice:
+
+- **Generation** slowed to roughly three minutes per level, making a 200-level rebuild a
+  multi-hour job.
+- **The game itself.** The on-device solver answers "is this still winnable?" after
+  *every* move, and that answer is what the free rewind is built on. At 130k states the
+  check visibly stalls; a full re-solve on the largest shipped board (9×10, 4 stands,
+  ~24 buses) measures **204 ms in a browser**, which is already at the edge of
+  imperceptible.
+
+So the generator carries a hard `STATE_CAP`, and it is a playability gate rather than a
+performance budget: any board the generator cannot analyse quickly is a board the game
+could not have rescued the player on. Four open stands is the ceiling that keeps it.
+
+If five or six stands are ever wanted, the rewind check has to stop being an exhaustive
+search — a bounded-depth check with a "probably still fine" answer would be fast enough,
+but it would weaken a promise the whole design rests on. That is a real trade, not a
+tuning knob.
+
+## 17. Breather levels need a smaller board, not just a lower target
+
+Past level ~100 the parameter set could no longer build a board easy enough for a
+breather: level 180 targeted 34.7 and the easiest of hundreds of candidates still scored
+49.0. Lowering the target does nothing if every candidate is above it. Breathers now get
+a genuinely smaller board — about 60% of the bus count, fewer cones and fewer surplus
+buses — and land on target (level 180 now scores 36.2).
+
 ## 11. Early levels are unlosable, and that is correct
 
 Ten levels in chapter 1 have solution density 1.00 — every legal move keeps the

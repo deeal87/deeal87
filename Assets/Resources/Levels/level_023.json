@@ -17,12 +17,12 @@
       "color": "red",
       "cells": [
         [
-          2,
-          3
+          0,
+          5
         ],
         [
-          3,
-          3
+          1,
+          5
         ]
       ],
       "facing": "right",
@@ -37,11 +37,11 @@
           2
         ],
         [
-          1,
-          2
+          0,
+          3
         ]
       ],
-      "facing": "right",
+      "facing": "up",
       "capacity": 3
     },
     {
@@ -49,31 +49,31 @@
       "color": "red",
       "cells": [
         [
-          4,
-          1
+          0,
+          4
         ],
         [
-          4,
-          2
+          1,
+          4
         ]
       ],
-      "facing": "down",
+      "facing": "left",
       "capacity": 3
     },
     {
       "id": 4,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          3,
-          4
+          2,
+          0
         ],
         [
           3,
-          5
+          0
         ]
       ],
-      "facing": "down",
+      "facing": "left",
       "capacity": 3
     },
     {
@@ -81,26 +81,48 @@
       "color": "red",
       "cells": [
         [
-          0,
-          3
+          3,
+          2
         ],
         [
-          1,
+          3,
           3
         ]
       ],
-      "facing": "left",
+      "facing": "down",
+      "capacity": 3
+    },
+    {
+      "id": 6,
+      "color": "blue",
+      "cells": [
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "facing": "up",
       "capacity": 3
     }
   ],
   "blocked": [
     [
       1,
-      4
+      3
     ]
   ],
   "queue": [
     {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
       "color": "red"
     },
     {
@@ -116,16 +138,19 @@
       "color": "red"
     },
     {
-      "color": "blue"
+      "color": "red"
     },
     {
-      "color": "blue"
+      "color": "red"
     },
     {
       "color": "red"
     },
     {
       "color": "red"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "red"
@@ -138,21 +163,22 @@
     }
   ],
   "analysis": {
-    "optimal": 4,
-    "states": 37,
-    "solutionDensity": 0.803,
+    "optimal": 5,
+    "states": 142,
+    "solutionDensity": 0.8052,
     "trapDepth": 3,
-    "forcedRatio": 0.0455,
+    "forcedRatio": 0.0,
     "deception": 0.0,
     "deceptionMax": 0,
-    "deadEnds": 12,
-    "raw": 0.7326,
-    "mds": 9.4
+    "deadEnds": 60,
+    "raw": 0.7996,
+    "mds": 11.2
   },
   "solution": [
     1,
+    2,
+    6,
     3,
-    4,
-    2
+    4
   ]
 }
