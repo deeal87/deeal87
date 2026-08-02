@@ -291,6 +291,44 @@ Two things to carry forward:
 - Solver cost tracks *branching*, not board content. Anything deterministic is
   cheap. That is a general lever, not a one-off.
 
+## 20. An empty board is a worse tutorial than a full one
+
+Playtest verdict on the opening: *the early levels just feel too easy and
+empty.* Both halves were true and they had the same cause — 3 buses on a 5×5
+lot, which is what a target of MDS 4 buys you.
+
+The instinct is that filling the board makes the tutorial hard. Measured at
+level 1, two colours, three bays:
+
+| Buses | Board | Queue | States | MDS | Solution density |
+|---:|---|---:|---:|---:|---:|
+| 3 | 5×5 | 18 | 8 | 1.7 | 1.00 |
+| 6 | 5×5 | 36 | 125 | 4.2 | 0.95 |
+| 8 | 6×6 | 48 | 541 | 6.3 | 0.92 |
+| 10 | 7×7 | 60 | 2 542 | 12.1 | 0.85 |
+| 12 | 7×7 | 72 | 8 644 | 16.8 | 0.80 |
+| 14 | 8×8 | 84 | 32 400 | 22.9 | 0.76 |
+
+MDS triples from 3 buses to 10, but **solution density only falls from 1.00 to
+0.85** — four moves in five still win. Almost all of the MDS rise is state
+count, and a player never searches a 2 500-state graph; they look two moves
+ahead. This is finding §6 resurfacing at the bottom of the ladder: the scorer
+still partly measures board size, and at the opening that reads as difficulty
+when it is really just fullness.
+
+So the curve floor moved from 4 to 10 and the bus ramp from 3→22 to 9→22, with
+the board starting at 7×7. Level 1 now carries 9 buses and 54 passengers
+against 3 and 18. **The guarantee that actually matters is density, not MDS**,
+and it is the one under test: levels 1–8 must stay at 0.75 or better.
+
+A failed idea worth recording, because it looks obviously right: making a
+breather forgiving by cutting its COLOURS instead of its buses, so the board
+stays full. At level 190, dropping 8 colours to 5 moved the score by 1.8 points
+(50.9 → 49.1) and the state count went *up* — with fewer colours more docked
+buses match the head, so more orderings stay viable. At 3 colours the schedule
+cannot be built at all, since only one bus per colour may be docked at a time.
+Breathers still cut the bus count, just more gently (×0.78, was ×0.62).
+
 ## 11. Early levels are unlosable, and that is correct
 
 Ten levels in chapter 1 have solution density 1.00 — every legal move keeps the
@@ -301,6 +339,11 @@ badly enough to matter.
 It gives the opening exactly the shape onboarding wants, and the first real trap
 appears at level 9, which is where the game starts asking something. Kept
 deliberately, and asserted by test so it cannot drift.
+
+*(Superseded in part by §20. Playtest found that opening too empty, so the
+boards were filled out and density in chapter 1 now sits around 0.85 rather
+than 1.00 — forgiving, but no longer literally unfailable. The test threshold
+of 0.75 is unchanged and still the real guarantee.)*
 
 ## 12. Chain boarding is the best feel moment in the game
 
@@ -357,21 +400,23 @@ solution: no level can be won with a bus still standing in the lot.
 
 | Chapter | Levels | Mean MDS | Solution density | Max deception | Buses | Queue |
 |---:|---:|---:|---:|---:|---:|---:|
-| 1 | 1–25 | 5.9 | 0.89 | 1 | 4.1 | 24 |
-| 2 | 26–50 | 13.5 | 0.69 | 4 | 6.4 | 35 |
-| 3 | 51–75 | 21.4 | 0.67 | 6 | 8.7 | 44 |
-| 4 | 76–100 | 30.0 | 0.55 | 8 | 11.0 | 53 |
-| 5 | 101–125 | 38.5 | 0.44 | 12 | 13.4 | 71 |
-| 6 | 126–150 | 47.0 | 0.39 | 14 | 15.6 | 84 |
-| 7 | 151–175 | 55.5 | 0.34 | 14 | 17.9 | 107 |
-| 8 | 176–200 | 64.4 | 0.28 | 11 | 20.2 | 121 |
+| 1 | 1–25 | 12.4 | 0.83 | 4 | 9.6 | 58 |
+| 2 | 26–50 | 19.1 | 0.64 | 7 | 11.3 | 62 |
+| 3 | 51–75 | 25.4 | 0.60 | 8 | 12.9 | 65 |
+| 4 | 76–100 | 33.9 | 0.51 | 9 | 14.4 | 70 |
+| 5 | 101–125 | 41.1 | 0.43 | 11 | 16.1 | 86 |
+| 6 | 126–150 | 49.4 | 0.38 | 11 | 17.6 | 96 |
+| 7 | 151–175 | 57.2 | 0.33 | 14 | 19.2 | 113 |
+| 8 | 176–200 | 64.8 | 0.28 | 14 | 20.9 | 125 |
 
 Difficulty rises monotonically on every measure that matters: levels get less
-forgiving (density 0.89 → 0.28) and mistakes take longer to reveal themselves
-(deception 1 → 14). 13,506 passengers across the ladder, against 5,100 before
-the capacity change — the tray now reads as a full board rather than a thin row.
-Peak solver cost is 59,889 states, just inside the 60,000 playability gate.
-Regenerating the whole ladder takes about twelve minutes.
+forgiving (density 0.83 → 0.28) and mistakes take longer to reveal themselves
+(deception 4 → 14). 16,887 passengers across the ladder, and no board is
+thinner than 43 — the tray reads as a full board from level 1 rather than from
+level 100. Opening density runs 0.80–0.89, comfortably inside the 0.75 floor
+that is the real forgiveness guarantee (§20). Peak solver cost is 59,686
+states, just inside the 60,000 playability gate. Regenerating the whole ladder
+takes about twenty minutes.
 
 ---
 

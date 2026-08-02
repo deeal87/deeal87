@@ -3,8 +3,8 @@
   "id": 14,
   "chapter": 1,
   "grid": {
-    "w": 5,
-    "h": 5
+    "w": 7,
+    "h": 7
   },
   "bays": 3,
   "colors": [
@@ -18,30 +18,30 @@
       "cells": [
         [
           1,
-          2
+          4
         ],
         [
           2,
-          2
+          4
         ]
       ],
-      "facing": "right",
+      "facing": "left",
       "capacity": 6
     },
     {
       "id": 2,
-      "color": "red",
+      "color": "blue",
       "cells": [
         [
-          0,
-          3
+          3,
+          6
         ],
         [
-          0,
-          4
+          4,
+          6
         ]
       ],
-      "facing": "up",
+      "facing": "left",
       "capacity": 6
     },
     {
@@ -53,7 +53,23 @@
           0
         ],
         [
+          1,
+          1
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 4,
+      "color": "red",
+      "cells": [
+        [
           2,
+          0
+        ],
+        [
+          3,
           0
         ]
       ],
@@ -61,41 +77,115 @@
       "capacity": 6
     },
     {
-      "id": 4,
+      "id": 5,
       "color": "blue",
       "cells": [
         [
-          1,
+          3,
           1
         ],
         [
-          2,
+          4,
           1
         ]
       ],
       "facing": "right",
+      "capacity": 6
+    },
+    {
+      "id": 6,
+      "color": "red",
+      "cells": [
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          5
+        ]
+      ],
+      "facing": "up",
+      "capacity": 6
+    },
+    {
+      "id": 7,
+      "color": "blue",
+      "cells": [
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "facing": "up",
+      "capacity": 6
+    },
+    {
+      "id": 8,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ]
+      ],
+      "facing": "left",
+      "capacity": 6
+    },
+    {
+      "id": 9,
+      "color": "blue",
+      "cells": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 10,
+      "color": "red",
+      "cells": [
+        [
+          5,
+          5
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "facing": "up",
       "capacity": 6
     }
   ],
   "blocked": [],
   "queue": [
     {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
+      "color": "blue"
     },
     {
       "color": "red"
     },
     {
       "color": "blue"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "blue"
@@ -105,21 +195,6 @@
     },
     {
       "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "blue"
     },
     {
       "color": "blue"
@@ -146,28 +221,163 @@
       "color": "red"
     },
     {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
       "color": "red"
     },
     {
       "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     }
   ],
   "analysis": {
-    "optimal": 4,
-    "states": 27,
-    "solutionDensity": 0.85,
+    "optimal": 10,
+    "states": 5381,
+    "solutionDensity": 0.8109,
     "trapDepth": 3,
-    "forcedRatio": 0.15,
+    "forcedRatio": 0.0871,
     "deception": 0.0,
     "deceptionMax": 0,
-    "deadEnds": 6,
-    "raw": 0.5962,
-    "mds": 6.6
+    "deadEnds": 2166,
+    "raw": 0.8969,
+    "mds": 14.3
   },
   "solution": [
     1,
     2,
     4,
-    3
+    5,
+    6,
+    7,
+    8,
+    3,
+    9,
+    10
   ]
 }

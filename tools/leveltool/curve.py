@@ -16,6 +16,13 @@ TOTAL_LEVELS = 200
 # dozen levels all target a difficulty no board can hit, which shows up as
 # permanent drift rather than as harder levels.
 CEILING = 72.0
+# Floor of the curve, and it is a measured value, not a taste one. The opening
+# used to target MDS 4, which a 3-bus board on a 5x5 lot hits exactly - and
+# which playtest called empty and too easy. A board full enough to look like the
+# rest of the game measures ~10 even when it is still thoroughly forgiving
+# (solution density ~0.85). Aiming below what the smallest shipped board can
+# produce just means the generator misses the target on every early level.
+FLOOR = 10.0
 PALETTE = ["red", "blue", "green", "yellow", "purple", "orange", "pink", "teal"]
 
 
@@ -25,14 +32,20 @@ def target_mds(n: int) -> float:
     The exponent is above 1 on purpose: the curve must stay almost flat through
     the tutorial and rise steadily afterwards. An exponent below 1 (the first
     draft used 0.80) reaches MDS 13 by level 10, which contradicts an opening
-    chapter whose whole job is to be unfailable.
+    chapter whose job is to be forgiving.
+
+    Note that "forgiving" is carried by SOLUTION DENSITY, not by this number.
+    The opening now targets ~10 rather than ~4 because the boards are full, and
+    a full board scores higher mostly through state count - which no player ever
+    searches. The guarantee that matters, and the one under test, is that
+    levels 1-8 keep a density of 0.75 or better: three moves in four still win.
     """
     # The span stops at what this ruleset can actually deliver, not at a round
     # 100. Measured ceiling with the current mechanic set is ~MDS 78; aiming the
     # curve past it just makes every level below it read as too easy, because
     # the fit stretches to chase a top it can never reach. Raise CEILING when a
     # new deception-class mechanic lands - see docs/PROTOTYPE_FINDINGS.md.
-    base = 4.0 + (CEILING - 4.0) * (n / TOTAL_LEVELS) ** 1.15
+    base = FLOOR + (CEILING - FLOOR) * (n / TOTAL_LEVELS) ** 1.15
 
     # Sawtooth: a guaranteed breather right after a hard level, a spike on the
     # chapter boundary. Proportional rather than absolute - a flat -12 drops the
@@ -83,13 +96,23 @@ def params_for(n: int) -> GenParams:
     # set by what a 9x10 lot can physically hold: each bus needs a clear exit
     # path at the moment it is placed, and past ~22 the placer starts failing
     # more often than it succeeds.
-    buses = 3 + round(19 * t)
-    colors = min(len(PALETTE), 2 + n // 30)
+    #
+    # The BOTTOM of the ramp used to be 3 buses on a 5x5 board, which measured
+    # as a perfect tutorial and played as an empty car park - the complaint from
+    # playtest was that the opening looks and feels like nothing is happening.
+    # It now starts at 9. Filling the board turns out to cost far less
+    # forgiveness than it looks: at nine buses in two colours the solution
+    # density is still ~0.85, so four moves in five keep the level winnable.
+    # What rises is mostly the state count, and a player never searches that.
+    buses = 9 + round(13 * t)
+    colors = min(len(PALETTE), 2 + n // 28)
 
-    # The lot is a stretch of motorway, and it widens as the game goes on. Cells
-    # are drawn smaller so a 9x10 board still fits a phone screen.
-    width = min(9, 5 + (n > 25) + (n > 60) + (n > 105) + (n > 155))
-    height = min(10, 5 + (n > 20) + (n > 50) + (n > 90) + (n > 135) + (n > 175))
+    # The lot widens as the game goes on. Cells are drawn smaller so a 9x10
+    # board still fits a phone screen. The floor is 7x7: a fuller opening needs
+    # somewhere to put the buses, and a 5x5 lot cannot hold nine of them with a
+    # clear exit path each.
+    width = min(9, 7 + (n > 70) + (n > 140))
+    height = min(10, 7 + (n > 45) + (n > 105) + (n > 160))
 
     # Open stands. The terminal always shows six numbered stands; this is how
     # many are in service. Counter-intuitively, MORE open stands is more
@@ -119,8 +142,15 @@ def params_for(n: int) -> GenParams:
     # parameter set simply cannot build a board that easy - the easiest of 300
     # candidates still came out 14 points too hard. So a breather gets a
     # genuinely smaller board, not just a smaller target.
+    #
+    # Cutting COLOURS instead was tried, to keep the board full: it does not
+    # work. At level 190, dropping 8 colours to 5 moved the score by 1.8 points
+    # (50.9 -> 49.1) while the state count went UP, because more docked buses
+    # match the head and more orderings stay viable. At 3 colours the schedule
+    # cannot even be built - only one bus per colour may be docked at a time.
+    # So the bus count it is, but gently: 0.62 left the board looking deserted.
     if n % 10 == 0 and n % 25 != 0:
-        buses = max(3, round(buses * 0.62))
+        buses = max(6, round(buses * 0.78))
         blocked = max(0, blocked - 2)
 
     chapter = min(8, (n - 1) // 25 + 1)

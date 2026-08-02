@@ -67,7 +67,7 @@ Top to bottom, the screen is a tray of waiting passengers, a row of stands, and 
 ├─────────────────────────────────────┤
 │  ▁1  ▁2  ▁3  ▁4  ▨5  ▨6             │   Six painted stands, 3–4 in service.
 ├═════════════════════════════════════┤
-│   ┌──┐  ┌──────┐   ┌──┐             │   THE LOT (grid, 5×5 → 9×10). Each
+│   ┌──┐  ┌──────┐   ┌──┐             │   THE LOT (grid, 7×7 → 9×10). Each
 │   │ ↑│  │  ←   │   │ ↑│             │   vehicle carries one big white
 │   └──┘  └──────┘   └──┘             │   arrow: the direction it leaves in.
 │      ┌──────┐   ┌──┐                │   A vehicle occupies 1×2 (3 seats)
@@ -250,18 +250,25 @@ deception is only fair if the game tells you the moment it happens.
 ### 5.3 The target curve
 
 ```
-Target(n) = 4 + 68 · (n / 200)^1.15          # gentle opening, steady rise
+Target(n) = 10 + 62 · (n / 200)^1.15         # full opening, steady rise
           × 1.18  if n mod 25 == 0           # milestone spike
           × 0.58  else if n mod 10 == 0      # breather - never on a milestone
           × (1 ± 0.07)                       # texture, so it never feels metronomic
 Clamped to [3, 72].
 ```
 
-Three details that only became obvious once it was measured:
+Four details that only became obvious once it was measured:
 
 - **The exponent is above 1.** The first draft used 0.80, which rises fastest at
   the very start and wanted MDS 13 by level 10 — from an opening chapter whose
-  whole job is to be unfailable.
+  job is to be forgiving.
+- **The floor is 10, not 4.** A target of 4 is what a 3-bus board on a 5×5 lot
+  measures, and that board plays as an empty car park — the playtest verdict on
+  the opening was "too easy and empty". A board full enough to look like the
+  rest of the game measures ~10 while still being thoroughly forgiving. What
+  rises with a fuller board is mostly *state count*, which no player searches.
+  Forgiveness is carried by **solution density**, not by this number, and that
+  is the thing under test: levels 1–8 must keep density ≥ 0.75.
 - **The breather never lands on a milestone.** Levels 50, 100, 150 and 200 are
   multiples of both 10 and 25; applying both modifiers made the flagship levels
   *easier* than their neighbours.

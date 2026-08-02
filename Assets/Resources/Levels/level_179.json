@@ -9,10 +9,11 @@
   "bays": 4,
   "colors": [
     "purple",
-    "blue",
-    "yellow",
     "red",
+    "yellow",
     "green",
+    "teal",
+    "blue",
     "orange",
     "pink"
   ],
@@ -22,32 +23,32 @@
       "color": "purple",
       "cells": [
         [
-          3,
-          8
+          0,
+          9
         ],
         [
-          4,
-          8
+          1,
+          9
         ],
         [
-          5,
-          8
+          2,
+          9
         ]
       ],
-      "facing": "right",
+      "facing": "left",
       "capacity": 12
     },
     {
       "id": 2,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          1,
-          8
+          2,
+          0
         ],
         [
-          2,
-          8
+          3,
+          0
         ]
       ],
       "facing": "left",
@@ -55,38 +56,38 @@
     },
     {
       "id": 3,
-      "color": "yellow",
+      "color": "red",
       "cells": [
         [
-          6,
-          3
+          1,
+          1
         ],
         [
-          7,
-          3
+          1,
+          2
         ]
       ],
-      "facing": "left",
+      "facing": "up",
       "capacity": 6
     },
     {
       "id": 4,
-      "color": "red",
+      "color": "yellow",
       "cells": [
         [
-          8,
+          0,
+          0
+        ],
+        [
+          0,
           1
         ],
         [
-          8,
+          0,
           2
-        ],
-        [
-          8,
-          3
         ]
       ],
-      "facing": "down",
+      "facing": "up",
       "capacity": 12
     },
     {
@@ -94,15 +95,15 @@
       "color": "purple",
       "cells": [
         [
-          0,
-          2
+          4,
+          0
         ],
         [
-          0,
-          3
+          5,
+          0
         ]
       ],
-      "facing": "up",
+      "facing": "right",
       "capacity": 6
     },
     {
@@ -110,67 +111,223 @@
       "color": "green",
       "cells": [
         [
-          1,
-          0
-        ],
-        [
-          2,
-          0
-        ]
-      ],
-      "facing": "left",
-      "capacity": 6
-    },
-    {
-      "id": 7,
-      "color": "orange",
-      "cells": [
-        [
-          1,
+          0,
           3
         ],
         [
-          2,
-          3
-        ]
-      ],
-      "facing": "left",
-      "capacity": 6
-    },
-    {
-      "id": 8,
-      "color": "yellow",
-      "cells": [
+          0,
+          4
+        ],
         [
           0,
           5
-        ],
-        [
-          0,
-          6
-        ],
-        [
-          0,
-          7
         ]
       ],
       "facing": "up",
       "capacity": 12
     },
     {
-      "id": 9,
+      "id": 7,
       "color": "red",
       "cells": [
         [
-          7,
+          8,
           6
         ],
         [
-          7,
+          8,
           7
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 8,
+      "color": "teal",
+      "cells": [
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ]
+      ],
+      "facing": "left",
+      "capacity": 6
+    },
+    {
+      "id": 9,
+      "color": "blue",
+      "cells": [
+        [
+          7,
+          8
         ],
         [
           7,
+          9
+        ]
+      ],
+      "facing": "up",
+      "capacity": 6
+    },
+    {
+      "id": 10,
+      "color": "orange",
+      "cells": [
+        [
+          6,
+          4
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          6
+        ]
+      ],
+      "facing": "down",
+      "capacity": 12
+    },
+    {
+      "id": 11,
+      "color": "pink",
+      "cells": [
+        [
+          8,
+          2
+        ],
+        [
+          8,
+          3
+        ]
+      ],
+      "facing": "up",
+      "capacity": 6
+    },
+    {
+      "id": 12,
+      "color": "green",
+      "cells": [
+        [
+          6,
+          7
+        ],
+        [
+          6,
+          8
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 13,
+      "color": "pink",
+      "cells": [
+        [
+          3,
+          8
+        ],
+        [
+          3,
+          9
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 14,
+      "color": "blue",
+      "cells": [
+        [
+          2,
+          7
+        ],
+        [
+          2,
+          8
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 15,
+      "color": "green",
+      "cells": [
+        [
+          7,
+          3
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          7,
+          5
+        ]
+      ],
+      "facing": "up",
+      "capacity": 12
+    },
+    {
+      "id": 16,
+      "color": "orange",
+      "cells": [
+        [
+          3,
+          1
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "facing": "left",
+      "capacity": 12
+    },
+    {
+      "id": 17,
+      "color": "pink",
+      "cells": [
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ]
+      ],
+      "facing": "left",
+      "capacity": 6
+    },
+    {
+      "id": 18,
+      "color": "teal",
+      "cells": [
+        [
+          1,
+          6
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          1,
           8
         ]
       ],
@@ -178,192 +335,52 @@
       "capacity": 12
     },
     {
-      "id": 10,
-      "color": "pink",
-      "cells": [
-        [
-          2,
-          9
-        ],
-        [
-          3,
-          9
-        ]
-      ],
-      "facing": "right",
-      "capacity": 6
-    },
-    {
-      "id": 11,
-      "color": "red",
-      "cells": [
-        [
-          8,
-          5
-        ],
-        [
-          8,
-          6
-        ],
-        [
-          8,
-          7
-        ]
-      ],
-      "facing": "down",
-      "capacity": 12
-    },
-    {
-      "id": 12,
-      "color": "orange",
-      "cells": [
-        [
-          4,
-          0
-        ],
-        [
-          5,
-          0
-        ],
-        [
-          6,
-          0
-        ]
-      ],
-      "facing": "left",
-      "capacity": 12
-    },
-    {
-      "id": 13,
-      "color": "blue",
-      "cells": [
-        [
-          4,
-          2
-        ],
-        [
-          5,
-          2
-        ]
-      ],
-      "facing": "left",
-      "capacity": 6
-    },
-    {
-      "id": 14,
-      "color": "green",
-      "cells": [
-        [
-          6,
-          9
-        ],
-        [
-          7,
-          9
-        ]
-      ],
-      "facing": "right",
-      "capacity": 6
-    },
-    {
-      "id": 15,
-      "color": "yellow",
-      "cells": [
-        [
-          5,
-          5
-        ],
-        [
-          6,
-          5
-        ]
-      ],
-      "facing": "left",
-      "capacity": 6
-    },
-    {
-      "id": 16,
-      "color": "pink",
-      "cells": [
-        [
-          2,
-          4
-        ],
-        [
-          3,
-          4
-        ]
-      ],
-      "facing": "right",
-      "capacity": 6
-    },
-    {
-      "id": 17,
-      "color": "purple",
-      "cells": [
-        [
-          2,
-          7
-        ],
-        [
-          3,
-          7
-        ],
-        [
-          4,
-          7
-        ]
-      ],
-      "facing": "left",
-      "capacity": 12
-    },
-    {
-      "id": 18,
-      "color": "yellow",
-      "cells": [
-        [
-          5,
-          4
-        ],
-        [
-          6,
-          4
-        ],
-        [
-          7,
-          4
-        ]
-      ],
-      "facing": "right",
-      "capacity": 12
-    },
-    {
       "id": 19,
-      "color": "pink",
+      "color": "yellow",
       "cells": [
         [
-          3,
-          2
+          4,
+          9
         ],
         [
-          3,
-          3
+          5,
+          9
         ]
       ],
-      "facing": "up",
+      "facing": "left",
       "capacity": 6
     },
     {
       "id": 20,
-      "color": "pink",
+      "color": "teal",
       "cells": [
         [
-          4,
-          9
+          3,
+          5
         ],
         [
-          5,
-          9
+          3,
+          6
+        ],
+        [
+          3,
+          7
+        ]
+      ],
+      "facing": "up",
+      "capacity": 12
+    },
+    {
+      "id": 21,
+      "color": "orange",
+      "cells": [
+        [
+          6,
+          1
+        ],
+        [
+          7,
+          1
         ]
       ],
       "facing": "right",
@@ -372,46 +389,73 @@
   ],
   "blocked": [
     [
-      1,
-      1
+      0,
+      8
     ],
     [
       1,
+      3
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      5,
       4
     ],
     [
-      1,
-      9
-    ],
-    [
-      3,
-      6
-    ],
-    [
-      7,
-      5
+      6,
+      2
     ],
     [
       8,
-      0
+      5
     ]
   ],
   "queue": [
     {
-      "color": "green"
+      "color": "red",
+      "luggage": true
+    },
+    {
+      "color": "red",
+      "luggage": true
+    },
+    {
+      "color": "yellow"
     },
     {
       "color": "green"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "purple"
     },
     {
       "color": "green",
       "luggage": true
     },
     {
-      "color": "orange"
+      "color": "yellow"
     },
     {
       "color": "green"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "purple",
+      "luggage": true
+    },
+    {
+      "color": "purple"
     },
     {
       "color": "orange"
@@ -420,26 +464,92 @@
       "color": "red"
     },
     {
+      "color": "red"
+    },
+    {
+      "color": "purple",
+      "luggage": true
+    },
+    {
+      "color": "pink"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "pink"
+    },
+    {
+      "color": "pink"
+    },
+    {
       "color": "orange"
     },
     {
-      "color": "green"
-    },
-    {
-      "color": "red"
+      "color": "orange"
     },
     {
       "color": "orange",
       "luggage": true
     },
     {
-      "color": "red"
+      "color": "yellow",
+      "luggage": true
+    },
+    {
+      "color": "pink",
+      "luggage": true
     },
     {
       "color": "orange"
     },
     {
-      "color": "red"
+      "color": "purple",
+      "luggage": true
+    },
+    {
+      "color": "pink"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "purple"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "purple",
+      "luggage": true
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "purple"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "blue",
+      "luggage": true
+    },
+    {
+      "color": "pink",
+      "luggage": true
     },
     {
       "color": "blue"
@@ -448,7 +558,245 @@
       "color": "pink"
     },
     {
+      "color": "teal"
+    },
+    {
       "color": "pink"
+    },
+    {
+      "color": "blue",
+      "luggage": true
+    },
+    {
+      "color": "pink",
+      "luggage": true
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "purple"
+    },
+    {
+      "color": "purple"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "purple",
+      "luggage": true
+    },
+    {
+      "color": "green",
+      "luggage": true
+    },
+    {
+      "color": "green",
+      "luggage": true
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "green",
+      "luggage": true
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "purple",
+      "luggage": true
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "yellow",
+      "luggage": true
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "yellow"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "green",
+      "luggage": true
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "green",
+      "luggage": true
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red",
+      "luggage": true
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red",
+      "luggage": true
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "teal",
+      "luggage": true
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "teal"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green",
+      "luggage": true
     },
     {
       "color": "blue",
@@ -461,407 +809,89 @@
       "color": "blue"
     },
     {
-      "color": "red"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "pink",
-      "luggage": true
-    },
-    {
-      "color": "pink",
-      "luggage": true
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red",
-      "luggage": true
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "green"
-    },
-    {
-      "color": "green"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "green"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "red",
-      "luggage": true
-    },
-    {
-      "color": "green",
-      "luggage": true
-    },
-    {
-      "color": "pink",
-      "luggage": true
-    },
-    {
       "color": "pink"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "green"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red",
-      "luggage": true
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "pink",
-      "luggage": true
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "red",
-      "luggage": true
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "pink",
-      "luggage": true
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "red"
     },
     {
       "color": "orange",
       "luggage": true
     },
     {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow",
+      "color": "pink",
       "luggage": true
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "orange",
-      "luggage": true
-    },
-    {
-      "color": "red"
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "orange"
-    },
-    {
-      "color": "pink"
-    },
-    {
-      "color": "red",
-      "luggage": true
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "red",
-      "luggage": true
-    },
-    {
-      "color": "pink"
     },
     {
       "color": "blue",
       "luggage": true
     },
     {
-      "color": "red"
-    },
-    {
       "color": "pink"
     },
     {
-      "color": "yellow"
+      "color": "orange"
     },
     {
-      "color": "pink"
+      "color": "orange"
     },
     {
-      "color": "purple"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "purple",
+      "color": "pink",
       "luggage": true
     },
     {
-      "color": "purple",
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange"
+    },
+    {
+      "color": "orange",
       "luggage": true
     },
     {
-      "color": "yellow"
-    },
-    {
-      "color": "purple",
-      "luggage": true
-    },
-    {
-      "color": "purple"
-    },
-    {
-      "color": "yellow"
-    },
-    {
-      "color": "yellow",
-      "luggage": true
-    },
-    {
-      "color": "purple",
-      "luggage": true
+      "color": "orange"
     }
   ],
   "analysis": {
-    "optimal": 20,
-    "states": 59889,
-    "solutionDensity": 0.2622,
+    "optimal": 21,
+    "states": 46306,
+    "solutionDensity": 0.2374,
     "trapDepth": 1,
-    "forcedRatio": 0.0063,
-    "deception": 0.271,
-    "deceptionMax": 6,
-    "deadEnds": 49505,
-    "raw": 1.7482,
-    "mds": 65.4
+    "forcedRatio": 0.0038,
+    "deception": 0.318,
+    "deceptionMax": 9,
+    "deadEnds": 39564,
+    "raw": 1.8036,
+    "mds": 68.9
   },
   "solution": [
-    5,
-    6,
-    7,
-    11,
-    2,
-    19,
+    1,
     3,
     4,
-    14,
-    8,
-    20,
     12,
-    10,
-    17,
-    9,
-    18,
+    21,
+    11,
+    8,
+    14,
     13,
+    18,
+    5,
+    6,
+    19,
+    2,
     16,
-    1,
-    15
+    15,
+    7,
+    20,
+    9,
+    10,
+    17
   ]
 }

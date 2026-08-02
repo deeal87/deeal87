@@ -270,7 +270,10 @@ class TestBakedLevels(unittest.TestCase):
 
     def test_early_levels_are_gentle_and_late_levels_are_not(self):
         by_id = {read_level(p).id: analyse(read_level(p)) for p in self.paths}
-        # The opening chapter must be nearly unfailable.
+        # The opening must be forgiving - three moves in four still win. This,
+        # not the MDS target, is the real guarantee: the boards were filled out
+        # after playtest called the opening empty, which raises MDS mostly
+        # through state count while leaving density almost untouched (§20).
         opening = [by_id[i].solution_density for i in range(1, 9)]
         self.assertGreaterEqual(min(opening), 0.75, "level 1-8 must be forgiving")
         # The closing chapter must not be.
