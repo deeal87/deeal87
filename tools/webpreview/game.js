@@ -267,7 +267,11 @@
       body.appendChild(sign);
     }
 
-    const row = el('div', 'seats');
+    // Six sockets fit across a body in one row. A twelve-seat double-decker
+    // gets two rows - which is what a double-decker is, so the shape carries
+    // the capacity instead of fighting it.
+    const perRow = bus.capacity > 6 ? Math.ceil(bus.capacity / 2) : bus.capacity;
+    const row = el('div', 'seats' + (bus.capacity > perRow ? ' twodeck' : ''));
     for (let i = 0; i < bus.capacity; i++) {
       const seat = el('div', 'seat');
       seat.dataset.seat = String(i);
@@ -278,6 +282,7 @@
       }
       row.appendChild(seat);
     }
+    row.style.setProperty('--per-row', String(perRow));
     body.appendChild(row);
     return body;
   }
@@ -399,8 +404,11 @@
 
     const width = wrap.clientWidth || (Math.min(window.innerWidth, 432) - 36);
     if (!app.tray || app.tray.width !== width) {
+      // Late levels carry 120+ passengers and all of them are drawn, so the
+      // tray is allowed a third of the screen. Below that the balls shrink
+      // past the point where colour is comfortable to read.
       app.tray = trayLayout(lvl.queue.length, width,
-                            Math.max(96, Math.min(224, window.innerHeight * 0.28)));
+                            Math.max(110, Math.min(300, window.innerHeight * 0.34)));
     }
     const t = app.tray;
     wrap.style.height = t.h + 'px';
@@ -445,8 +453,21 @@
 
   // ---- the boarding flight ----------------------------------------------- //
 
+  /**
+   * How fast to fly each ball, given how many are boarding on this move.
+   *
+   * A twelve-seat double-decker fills in one cascade. At the pace that reads
+   * beautifully for three balls that is three seconds of watching, which is
+   * where a nice animation turns into a wait. Long cascades accelerate; short
+   * ones keep the original timing, because they are the ones you actually see.
+   */
+  function boardingPace(count) {
+    return Math.max(0.38, Math.min(1, 1 - (count - 3) * 0.055));
+  }
+
   /** Flies the head ball from the platform into a seat, then fills the seat. */
-  async function flyIntoSeat(bayIndex, seatIndex, passenger) {
+  async function flyIntoSeat(bayIndex, seatIndex, passenger, pace) {
+    const p = pace || 1;
     const rider = document.querySelector(`.rider[data-index="${app.queueAt}"] .ball`);
     const seat = document.querySelector(`.bay[data-bay="${bayIndex}"] .seat[data-seat="${seatIndex}"]`);
     if (!rider || !seat) return;
@@ -459,6 +480,7 @@
     Object.assign(flyer.style, {
       left: from.left + 'px', top: from.top + 'px',
       width: from.width + 'px', height: from.height + 'px',
+      transition: `transform ${Math.round(380 * p)}ms cubic-bezier(.34, .8, .4, 1)`,
     });
     document.body.appendChild(flyer);
     rider.style.opacity = '0';
@@ -468,9 +490,9 @@
     const dy = to.top + (to.height - from.height) / 2 - from.top;
     await sleep(16);
     flyer.style.transform = `translate(${dx * 0.55}px, ${dy - 22}px) scale(1.08)`;
-    await sleep(110);
+    await sleep(Math.round(110 * p));
     flyer.style.transform = `translate(${dx}px, ${dy}px) scale(${to.width / from.width})`;
-    await sleep(120);
+    await sleep(Math.round(120 * p));
 
     flyer.remove();
     app.bays[bayIndex].seats[seatIndex] = { color: passenger.color };
@@ -540,12 +562,13 @@
     await sleep(140);
 
     // 3. Board the balls one at a time, so a cascade reads as a cascade.
+    const pace = boardingPace(events.filter((e) => e.kind === 'board').length);
     for (const evt of events) {
       if (evt.kind === 'board') {
         const passenger = app.level.queue[evt.queueIndex];
         const bay = app.bays[evt.bay];
         const seatIndex = bay ? bay.seats.findIndex((s) => s === null) : -1;
-        if (seatIndex >= 0) await flyIntoSeat(evt.bay, seatIndex, passenger);
+        if (seatIndex >= 0) await flyIntoSeat(evt.bay, seatIndex, passenger, pace);
         else { app.queueAt++; renderQueue(); }
       } else if (evt.kind === 'depart') {
         await sleep(120);

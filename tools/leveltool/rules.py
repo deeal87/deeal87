@@ -143,6 +143,18 @@ def validate_level(level: Level) -> list[str]:
     for color in seats:
         if color not in needed:
             problems.append(f"colour {color} has buses but no passengers")
+
+    # Every seat on the board is spoken for, per colour. Without this a level
+    # can be won while buses are still parked in the lot, which reads to the
+    # player as a bug rather than as a puzzle (see the generator docstring).
+    # Checked per colour, not just in total: matching totals with mismatched
+    # colours would leave a red bus stranded and a blue one over-supplied.
+    for color, have in sorted(seats.items()):
+        want = needed.get(color, 0)
+        if have > want:
+            problems.append(
+                f"{have - want} {color} seat(s) can never be filled: "
+                f"{have} on the board, {want} in the queue")
     if level.bays < 1:
         problems.append("a level needs at least one bay")
     return problems

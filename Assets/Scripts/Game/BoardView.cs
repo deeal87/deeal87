@@ -261,17 +261,30 @@ namespace SunnyStop.Game
 
             // Seat sockets, in boarding order. They start hidden and light up as
             // balls arrive, so capacity is countable without reading a number.
+            //
+            // Six fit along a body in one row. A twelve-seat double-decker gets
+            // two - which is what a double-decker is, so the shape carries the
+            // capacity rather than fighting it. Mirrors the browser preview.
             var view0 = go.AddComponent<BusView>();
+            int perRow = bus.Capacity > 6 ? (bus.Capacity + 1) / 2 : bus.Capacity;
+            Vector3 alongAxis = horizontal ? Vector3.right : Vector3.forward;
+            Vector3 acrossAxis = horizontal ? Vector3.forward : Vector3.right;
             for (int i = 0; i < bus.Capacity; i++)
             {
                 var seat = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 seat.name = $"Seat {i}";
                 seat.transform.SetParent(go.transform, false);
                 seat.transform.localScale = Vector3.one * 0.19f;
-                float t = bus.Capacity == 1 ? 0.5f : i / (float)(bus.Capacity - 1);
+
+                int column = i % perRow;
+                int deck = i / perRow;
+                float t = perRow == 1 ? 0.5f : column / (float)(perRow - 1);
                 float along = (t - 0.5f) * (length - 0.34f);
-                Vector3 axis = horizontal ? Vector3.right : Vector3.forward;
-                seat.transform.localPosition = axis * along + Vector3.up * 0.3f;
+                // One row stays on the centre line; two straddle it.
+                float across = bus.Capacity > perRow ? (deck == 0 ? -0.2f : 0.2f) : 0f;
+                seat.transform.localPosition =
+                    alongAxis * along + acrossAxis * across + Vector3.up * 0.3f;
+
                 Paint(seat, new Color(0.16f, 0.16f, 0.18f));
                 Destroy(seat.GetComponent<Collider>());
                 var seatRenderer = seat.GetComponent<Renderer>();

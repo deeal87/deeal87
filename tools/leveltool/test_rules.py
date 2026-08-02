@@ -277,31 +277,47 @@ class TestBakedLevels(unittest.TestCase):
         closing = [by_id[i].solution_density for i in range(191, 201)]
         self.assertLessEqual(max(closing), 0.55, "level 191-200 must bite")
 
-    def test_solution_dispatches_each_bus_at_most_once(self):
-        # A bus leaves the lot permanently, so no solution ever needs it twice.
-        # It may well leave buses behind: surplus buses are the mechanic that
-        # lets a mistake stay hidden, and the intended solution never touches
-        # them (docs/PROTOTYPE_FINDINGS.md).
+    def test_solution_dispatches_every_bus_exactly_once(self):
+        # A bus leaves the lot permanently, so no solution needs it twice - and
+        # since the surplus-bus mechanic was removed, none may be left behind
+        # either. If this ever loosens, players get the bug they reported:
+        # queue empty, buses still parked.
         for path in self.paths:
             with self.subTest(level=path.name):
                 data = json.loads(path.read_text(encoding="utf-8"))
                 solution = data["solution"]
                 ids = {b["id"] for b in data["buses"]}
                 self.assertEqual(len(set(solution)), len(solution), "bus dispatched twice")
-                self.assertTrue(set(solution) <= ids, "solution names a bus that is not there")
+                self.assertEqual(set(solution), ids,
+                                 "solution does not dispatch every bus on the board")
 
-    def test_later_levels_carry_surplus_buses(self):
-        # If surplus ever stopped being generated, difficulty would quietly
-        # collapse back to "every mistake is instantly obvious".
-        surplus_seen = 0
+    def test_no_bus_is_left_standing_when_the_queue_empties(self):
+        # The invariant the player actually sees. Total seats on the board must
+        # equal total seats the queue consumes, per colour - matching totals
+        # with mismatched colours would still strand a bus.
+        for path in self.paths:
+            with self.subTest(level=path.name):
+                data = json.loads(path.read_text(encoding="utf-8"))
+                seats: dict[str, int] = {}
+                for b in data["buses"]:
+                    seats[b["color"]] = seats.get(b["color"], 0) + b["capacity"]
+                needed: dict[str, int] = {}
+                for p in data["queue"]:
+                    needed[p["color"]] = needed.get(p["color"], 0) + (2 if p.get("luggage") else 1)
+                self.assertEqual(seats, needed,
+                                 "seats on the board do not match the queue exactly")
+
+    def test_the_queue_is_substantial(self):
+        # Passenger capacity is what makes the tray read as a full board rather
+        # than a thin row, and it is nearly free in solver cost. Guard the floor
+        # so a future capacity tweak cannot quietly empty it again.
+        by_id = {}
         for path in self.paths:
             data = json.loads(path.read_text(encoding="utf-8"))
-            if data["id"] < 22:
-                continue
-            if len(data["buses"]) > len(data["solution"]):
-                surplus_seen += 1
-        self.assertGreater(surplus_seen, 100,
-                           "surplus buses have stopped being generated")
+            by_id[data["id"]] = len(data["queue"])
+        self.assertGreaterEqual(by_id[1], 12, "even level 1 should fill the tray")
+        self.assertGreaterEqual(by_id[100], 60, "level 100 queue too thin")
+        self.assertGreaterEqual(by_id[200], 100, "level 200 queue too thin")
 
 
 if __name__ == "__main__":

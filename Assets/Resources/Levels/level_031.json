@@ -18,35 +18,51 @@
       "color": "green",
       "cells": [
         [
-          0,
-          1
+          3,
+          4
         ],
         [
-          1,
-          1
+          3,
+          5
         ]
       ],
-      "facing": "left",
-      "capacity": 3
+      "facing": "up",
+      "capacity": 6
     },
     {
       "id": 2,
       "color": "blue",
       "cells": [
         [
-          0,
-          4
+          2,
+          2
         ],
         [
-          1,
-          4
+          2,
+          3
         ]
       ],
-      "facing": "right",
-      "capacity": 3
+      "facing": "down",
+      "capacity": 6
     },
     {
       "id": 3,
+      "color": "green",
+      "cells": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "facing": "down",
+      "capacity": 6
+    },
+    {
+      "id": 4,
       "color": "blue",
       "cells": [
         [
@@ -58,78 +74,46 @@
           3
         ]
       ],
-      "facing": "down",
-      "capacity": 3
-    },
-    {
-      "id": 4,
-      "color": "green",
-      "cells": [
-        [
-          3,
-          1
-        ],
-        [
-          3,
-          2
-        ]
-      ],
       "facing": "up",
-      "capacity": 3
+      "capacity": 6
     },
     {
       "id": 5,
-      "color": "green",
+      "color": "red",
       "cells": [
         [
-          4,
+          2,
           1
         ],
         [
-          4,
-          2
+          3,
+          1
         ]
       ],
-      "facing": "down",
-      "capacity": 3
+      "facing": "right",
+      "capacity": 6
     },
     {
       "id": 6,
       "color": "red",
       "cells": [
         [
-          0,
-          0
-        ],
-        [
-          1,
-          0
-        ]
-      ],
-      "facing": "left",
-      "capacity": 3
-    },
-    {
-      "id": 7,
-      "color": "red",
-      "cells": [
-        [
           5,
-          0
+          2
         ],
         [
           5,
-          1
+          3
         ]
       ],
       "facing": "down",
-      "capacity": 3
+      "capacity": 6
     }
   ],
   "blocked": [
     [
-      3,
-      3
+      1,
+      4
     ]
   ],
   "queue": [
@@ -140,6 +124,57 @@
       "color": "green"
     },
     {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "green"
+    },
+    {
+      "color": "red"
+    },
+    {
       "color": "red"
     },
     {
@@ -155,22 +190,10 @@
       "color": "blue"
     },
     {
-      "color": "blue"
-    },
-    {
-      "color": "blue"
-    },
-    {
-      "color": "green"
-    },
-    {
       "color": "red"
     },
     {
       "color": "green"
-    },
-    {
-      "color": "red"
     },
     {
       "color": "green"
@@ -179,33 +202,48 @@
       "color": "blue"
     },
     {
+      "color": "green"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
       "color": "red"
     },
     {
       "color": "blue"
     },
     {
-      "color": "blue"
+      "color": "red"
     }
   ],
   "analysis": {
     "optimal": 6,
-    "states": 392,
-    "solutionDensity": 0.7866,
-    "trapDepth": 2,
-    "forcedRatio": 0.0786,
-    "deception": 0.104,
-    "deceptionMax": 1,
-    "deadEnds": 141,
-    "raw": 0.7811,
-    "mds": 10.7
+    "states": 206,
+    "solutionDensity": 0.6795,
+    "trapDepth": 1,
+    "forcedRatio": 0.303,
+    "deception": 0.576,
+    "deceptionMax": 4,
+    "deadEnds": 100,
+    "raw": 0.7227,
+    "mds": 9.2
   },
   "solution": [
-    1,
     2,
-    6,
     3,
+    5,
+    1,
     4,
-    7
+    6
   ]
 }

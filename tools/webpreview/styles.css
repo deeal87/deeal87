@@ -350,6 +350,9 @@ html { -webkit-text-size-adjust: 100%; background: var(--page); }
   background: #FFF;
   clip-path: polygon(0% 30%, 52% 30%, 52% 4%, 100% 50%, 52% 96%, 52% 70%, 0% 70%);
   filter: drop-shadow(0 1px 1px rgba(0,0,0,.28));
+  /* Above the sockets: on a twelve-seat double-decker they meet in the middle,
+     and the arrow is the one thing that must stay readable across the lot. */
+  z-index: 2;
 }
 /* The colour-blind glyph, on a small dark chip at the tail. */
 .sign {
@@ -365,6 +368,18 @@ html { -webkit-text-size-adjust: 100%; background: var(--page); }
 .seats {
   position: absolute; left: 6%; right: 6%; bottom: 7%;
   display: flex; align-items: center; justify-content: space-evenly; gap: 2%;
+}
+/* A double-decker: two rows of sockets, upper deck above lower. Grid rather
+   than wrapped flex, so the break is exactly where --per-row says it is. */
+.seats.twodeck {
+  display: grid;
+  grid-template-columns: repeat(var(--per-row), 1fr);
+  justify-items: center; align-items: center;
+  top: 9%; bottom: 9%; row-gap: 2%;
+}
+/* Twice as many sockets in the same body, so each one gives a little ground. */
+.seats.twodeck .seat {
+  width: calc(var(--seat) * 0.84); height: calc(var(--seat) * 0.84);
 }
 .seat {
   width: var(--seat); height: var(--seat);
@@ -382,6 +397,7 @@ html { -webkit-text-size-adjust: 100%; background: var(--page); }
 /* Parked at a stand: no arrow, no glyph chip, and the seats take the whole
    body — this is where you actually watch the balls land. */
 .body.parked .seats { bottom: auto; top: 50%; transform: translateY(-50%); left: 7%; right: 7%; }
+.body.parked .seats.twodeck { top: 9%; bottom: 9%; transform: none; left: 7%; right: 7%; }
 .body.parked .arrow, .body.parked .sign, .body.parked .screen { display: none; }
 
 .bus.hinted .body { animation: pulse 900ms ease-in-out infinite; }

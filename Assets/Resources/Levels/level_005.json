@@ -8,57 +8,57 @@
   },
   "bays": 3,
   "colors": [
-    "blue",
-    "red"
+    "red",
+    "blue"
   ],
   "buses": [
     {
       "id": 1,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          4,
-          3
+          1,
+          2
         ],
         [
-          4,
-          4
+          2,
+          2
         ]
       ],
-      "facing": "up",
-      "capacity": 3
+      "facing": "right",
+      "capacity": 6
     },
     {
       "id": 2,
       "color": "red",
       "cells": [
         [
-          0,
-          3
-        ],
-        [
-          0,
-          4
-        ]
-      ],
-      "facing": "up",
-      "capacity": 3
-    },
-    {
-      "id": 3,
-      "color": "red",
-      "cells": [
-        [
-          1,
-          1
-        ],
-        [
           2,
-          1
+          0
+        ],
+        [
+          3,
+          0
         ]
       ],
       "facing": "right",
-      "capacity": 3
+      "capacity": 6
+    },
+    {
+      "id": 3,
+      "color": "blue",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "facing": "up",
+      "capacity": 6
     }
   ],
   "blocked": [],
@@ -70,10 +70,19 @@
       "color": "red"
     },
     {
-      "color": "red"
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "red"
@@ -88,20 +97,38 @@
       "color": "blue"
     },
     {
-      "color": "blue"
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     }
   ],
   "analysis": {
     "optimal": 3,
-    "states": 8,
+    "states": 9,
     "solutionDensity": 1.0,
     "trapDepth": 4,
-    "forcedRatio": 0.4286,
+    "forcedRatio": 0.5,
     "deception": 0.0,
     "deceptionMax": 0,
     "deadEnds": 0,
-    "raw": 0.2103,
-    "mds": 2.3
+    "raw": 0.178,
+    "mds": 2.1
   },
   "solution": [
     1,

@@ -8,79 +8,88 @@
   },
   "bays": 3,
   "colors": [
-    "red",
-    "blue"
+    "blue",
+    "red"
   ],
   "buses": [
     {
       "id": 1,
-      "color": "red",
+      "color": "blue",
       "cells": [
         [
-          3,
+          1,
           1
         ],
         [
-          4,
-          1
+          1,
+          2
         ]
       ],
-      "facing": "left",
-      "capacity": 3
+      "facing": "down",
+      "capacity": 6
     },
     {
       "id": 2,
       "color": "red",
       "cells": [
         [
-          1,
-          4
+          3,
+          3
         ],
         [
-          2,
-          4
+          4,
+          3
         ]
       ],
       "facing": "left",
-      "capacity": 3
+      "capacity": 6
     },
     {
       "id": 3,
       "color": "blue",
       "cells": [
         [
-          1,
-          2
+          2,
+          0
         ],
         [
-          2,
-          2
+          3,
+          0
         ]
       ],
       "facing": "right",
-      "capacity": 3
+      "capacity": 6
     },
     {
       "id": 4,
-      "color": "red",
+      "color": "blue",
       "cells": [
         [
           0,
-          0
+          2
         ],
         [
-          1,
-          0
+          0,
+          3
         ]
       ],
-      "facing": "left",
-      "capacity": 3
+      "facing": "down",
+      "capacity": 6
     }
   ],
   "blocked": [],
   "queue": [
     {
+      "color": "blue"
+    },
+    {
       "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "blue"
@@ -92,16 +101,19 @@
       "color": "blue"
     },
     {
-      "color": "red"
+      "color": "blue"
     },
     {
-      "color": "red"
+      "color": "blue"
     },
     {
-      "color": "red"
+      "color": "blue"
     },
     {
-      "color": "red"
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     },
     {
       "color": "blue"
@@ -113,25 +125,49 @@
       "color": "red"
     },
     {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
       "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
     }
   ],
   "analysis": {
     "optimal": 4,
-    "states": 27,
-    "solutionDensity": 0.85,
-    "trapDepth": 3,
-    "forcedRatio": 0.15,
-    "deception": 0.0,
-    "deceptionMax": 0,
+    "states": 22,
+    "solutionDensity": 0.7692,
+    "trapDepth": 2,
+    "forcedRatio": 0.3077,
+    "deception": 0.333,
+    "deceptionMax": 1,
     "deadEnds": 6,
-    "raw": 0.5962,
-    "mds": 6.6
+    "raw": 0.6546,
+    "mds": 7.7
   },
   "solution": [
     1,
+    4,
     2,
-    3,
-    4
+    3
   ]
 }

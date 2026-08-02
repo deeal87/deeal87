@@ -8,25 +8,25 @@
   },
   "bays": 3,
   "colors": [
-    "blue",
-    "red"
+    "red",
+    "blue"
   ],
   "buses": [
     {
       "id": 1,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          2,
-          0
+          1,
+          2
         ],
         [
-          3,
-          0
+          2,
+          2
         ]
       ],
-      "facing": "left",
-      "capacity": 3
+      "facing": "right",
+      "capacity": 6
     },
     {
       "id": 2,
@@ -42,44 +42,62 @@
         ]
       ],
       "facing": "up",
-      "capacity": 3
+      "capacity": 6
     },
     {
       "id": 3,
       "color": "red",
       "cells": [
         [
-          4,
-          1
+          1,
+          0
         ],
-        [
-          4,
-          2
-        ]
-      ],
-      "facing": "up",
-      "capacity": 3
-    },
-    {
-      "id": 4,
-      "color": "red",
-      "cells": [
         [
           2,
-          3
-        ],
-        [
-          3,
-          3
+          0
         ]
       ],
       "facing": "right",
-      "capacity": 3
+      "capacity": 6
+    },
+    {
+      "id": 4,
+      "color": "blue",
+      "cells": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "facing": "right",
+      "capacity": 6
     }
   ],
   "blocked": [],
   "queue": [
     {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
       "color": "blue"
     },
     {
@@ -95,13 +113,31 @@
       "color": "red"
     },
     {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
       "color": "blue"
     },
     {
       "color": "red"
     },
     {
+      "color": "red"
+    },
+    {
       "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "red"
@@ -131,7 +167,7 @@
   "solution": [
     1,
     2,
-    3,
-    4
+    4,
+    3
   ]
 }

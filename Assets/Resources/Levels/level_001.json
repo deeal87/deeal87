@@ -17,32 +17,32 @@
       "color": "red",
       "cells": [
         [
-          0,
-          0
+          3,
+          3
         ],
         [
-          1,
-          0
+          4,
+          3
         ]
       ],
-      "facing": "right",
-      "capacity": 3
+      "facing": "left",
+      "capacity": 6
     },
     {
       "id": 2,
-      "color": "blue",
+      "color": "red",
       "cells": [
         [
-          1,
+          0,
           1
         ],
         [
           1,
-          2
+          1
         ]
       ],
-      "facing": "down",
-      "capacity": 3
+      "facing": "right",
+      "capacity": 6
     },
     {
       "id": 3,
@@ -50,23 +50,20 @@
       "cells": [
         [
           2,
-          3
+          0
         ],
         [
-          2,
-          4
+          3,
+          0
         ]
       ],
-      "facing": "up",
-      "capacity": 3
+      "facing": "right",
+      "capacity": 6
     }
   ],
   "blocked": [],
   "queue": [
     {
-      "color": "red"
-    },
-    {
       "color": "blue"
     },
     {
@@ -82,13 +79,43 @@
       "color": "red"
     },
     {
-      "color": "blue"
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "blue"
     },
     {
       "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     }
   ],
   "analysis": {

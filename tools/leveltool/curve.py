@@ -58,7 +58,6 @@ class GenParams:
     chapter: int
     luggage_chance: float = 0.0
     decker_chance: float = 0.0
-    decoys: int = 0
 
 
 def _ramp(n: int, start: int, full: int, low: float, high: float) -> float:
@@ -79,7 +78,12 @@ def params_for(n: int) -> GenParams:
     # Both ramps are deliberately slow early and steep late: the generator's
     # difficulty responds sharply to the first few extra buses and colours, so
     # a linear ramp overshoots the gentle opening of the target curve.
-    buses = 3 + round(17 * t)
+    # Every bus here is a bus the solution needs; there is no surplus any more,
+    # so this is the whole vehicle count on the board. The top of the ramp is
+    # set by what a 9x10 lot can physically hold: each bus needs a clear exit
+    # path at the moment it is placed, and past ~22 the placer starts failing
+    # more often than it succeeds.
+    buses = 3 + round(19 * t)
     colors = min(len(PALETTE), 2 + n // 30)
 
     # The lot is a stretch of motorway, and it widens as the game goes on. Cells
@@ -98,8 +102,9 @@ def params_for(n: int) -> GenParams:
     # reachable state space runs past 100k, and the on-device solver answers
     # "is this still winnable?" after EVERY move - at that size the free rewind
     # visibly stalls, and that rewind is the whole anti-frustration promise.
-    # Difficulty comes from board size, bus count, colours and surplus instead,
-    # all of which are cheap to search.
+    # Difficulty comes from board size, bus count, colours and seat capacity
+    # instead, all of which are cheap to search - capacity especially, since
+    # boarding is deterministic and so never branches (findings §19).
     bays = 4 if n >= 50 else 3
 
     blocked = 0 if n < 21 else min(6, 1 + (n - 21) // 26)
@@ -108,11 +113,7 @@ def params_for(n: int) -> GenParams:
     # ramps up, so the level where a player first meets it is never also the
     # level where it is hardest.
     luggage = _ramp(n, 36, 120, 0.15, 0.40)   # passengers taking two seats
-    decker = _ramp(n, 96, 180, 0.12, 0.35)    # capacity-6 buses, 3 cells long
-    # Surplus buses: the mechanic that lets a mistake stay hidden (see
-    # docs/PROTOTYPE_FINDINGS.md). Introduced early because without it the game
-    # can only punish instantly, never deceive.
-    decoys = 0 if n < 22 else min(5, 1 + (n - 22) // 38)
+    decker = _ramp(n, 96, 180, 0.12, 0.35)    # capacity-12 buses, 3 cells long
 
     # A breather level has a much lower target, and past level ~100 the normal
     # parameter set simply cannot build a board that easy - the easiest of 300
@@ -120,9 +121,8 @@ def params_for(n: int) -> GenParams:
     # genuinely smaller board, not just a smaller target.
     if n % 10 == 0 and n % 25 != 0:
         buses = max(3, round(buses * 0.62))
-        decoys = max(0, decoys - 2)
         blocked = max(0, blocked - 2)
 
     chapter = min(8, (n - 1) // 25 + 1)
     return GenParams(n, width, height, bays, buses, colors, blocked, chapter,
-                     luggage_chance=luggage, decker_chance=decker, decoys=decoys)
+                     luggage_chance=luggage, decker_chance=decker)

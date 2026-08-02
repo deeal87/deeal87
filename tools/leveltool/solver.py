@@ -42,8 +42,8 @@ L_MAX = 60.0
 DECEPTION_CAP = 3.0
 
 # Logistic centring, fitted by calibrate.py across the whole ladder with the
-# current mechanic set (colours, bays, cones, luggage, double-deckers, surplus
-# buses); rmse 11.0 MDS points. The slope is deliberately NOT the least-squares
+# current mechanic set (colours, bays, cones, luggage, double-deckers); rmse
+# 11.0 MDS points. The slope is deliberately NOT the least-squares
 # optimum (0.165, rmse 8.7): that value collapses every tutorial board to MDS
 # 0.0, leaving the index unable to tell level 1 from level 21. A usable index
 # across the whole ladder is worth more than two points of fit. The residual is concentrated at the very top:

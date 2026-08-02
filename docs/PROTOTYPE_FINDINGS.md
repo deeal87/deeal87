@@ -12,6 +12,9 @@ Seats match passengers, so a win necessarily empties the lot of the buses the
 solution uses. The optimal move count therefore equals the number of needed
 buses and carries no information about difficulty.
 
+*(Since §19 removed surplus buses, "needed" is now every bus on the board, and
+the optimal move count equals the bus count outright.)*
+
 **Consequences**
 
 - Move limits are meaningless in this design. Levels ship with `moveLimit: null`
@@ -55,7 +58,7 @@ every bay always eventually frees.
 **A puzzle is hard when a mistake stays hidden.** That needs a resource you can
 waste at a cost that shows up later.
 
-## 4. Surplus buses were the fix
+## 4. Surplus buses were the fix — later reversed, see §19
 
 Adding buses the solution does not need — parked off every intended route, so
 solvability by construction is untouched — creates exactly that. Send one into a
@@ -142,6 +145,10 @@ usable index across the whole ladder is worth more than two points of fit.
 Even with surplus buses, the measured ceiling is about **MDS 72**. Aiming the
 curve past it does not produce harder levels, only permanent drift on the last
 dozen, so `CEILING` is set to the measured maximum.
+
+*(Re-measured after §19 removed surplus and doubled capacity: the ceiling is
+unchanged at 72 — level 200 now lands at 70.5 and the best candidate seen in
+trials was 71.7 — so `CEILING` still stands.)*
 
 Raising it requires another mechanic of the same *class* as surplus buses —
 something that lets a player waste a resource at a delayed cost. Candidates, in
@@ -240,6 +247,50 @@ Two consequences worth carrying forward:
   light in dark mode only. Do not "fix" that by changing the palette per theme —
   the palette is shared with Unity and must stay one table.
 
+## 19. Surplus buses were the right mechanic and the wrong feature — capacity
+replaced them
+
+Finding §4 recorded surplus buses as the fix for "mistakes announce themselves
+instantly". Playtest killed it, and the reason is worth keeping.
+
+The report was: *buses sometimes stay standing even though all the balls are
+gone.* That is exactly what surplus buses do, and it was working as designed —
+but nothing on screen ever told the player those buses were never meant to
+leave. A win condition the board contradicts reads as a bug, not as a trap. The
+mechanic was invisible, and an invisible mechanic is indistinguishable from a
+defect. Measured across the shipped ladder before the change: **177 of 200
+levels** left at least one bus standing, up to 3 buses and 33 empty seats at
+level 200.
+
+The removal cost difficulty, so it needed a replacement lever. Three were tested
+at level 200:
+
+| Lever | Queue | Solver states | Notes |
+|---|---:|---:|---|
+| more buses (20 → 25) | — | — | placement fails 6/10; a 9×10 lot cannot hold them |
+| more buses (20 → 30) | — | — | placement fails 10/10 |
+| more seats (3/6 → 5/10) | 101 | 30.7k | works |
+| more seats (3/6 → 7/14) | 141 | 26.8k | works, and *fewer* states |
+
+**Capacity is nearly free and bus count is not.** Board area is the binding
+constraint on bus count — each bus needs a clear exit path at the moment it is
+placed, so past ~22 buses on 9×10 the placer fails more often than it succeeds.
+Capacity has no such limit: boarding is deterministic, so a bigger bus lengthens
+the cascade after a dispatch but never branches. Seats 3/6 → 6/12 roughly
+doubled the passenger count while state counts stayed flat or fell.
+
+Shipped: seats 6/12, bus ramp raised 17 → 19 (level 200 now carries 22 buses,
+which is what the lot holds), no surplus. Level 200 went from a 57-ball queue to
+122. Deception depth fell from 17 to 14, which is the honest cost.
+
+Two things to carry forward:
+
+- A difficulty mechanic the player cannot see is a bug report waiting to happen.
+  If surplus ever comes back it needs a visual — an "out of service" blind, a
+  dark windscreen, something.
+- Solver cost tracks *branching*, not board content. Anything deterministic is
+  cheap. That is a general lever, not a one-off.
+
 ## 11. Early levels are unlosable, and that is correct
 
 Ten levels in chapter 1 have solution density 1.00 — every legal move keeps the
@@ -300,23 +351,27 @@ levels are unlosable by design, so every order genuinely wins.
 
 ## The shipped ladder
 
-200 levels, all verified solvable, mean drift from target 1.5 MDS points,
-197 of 200 within 6 points.
+200 levels, all verified solvable, mean drift from target **1.3** MDS points,
+**200 of 200** within 6 points. Every bus on every board is part of the
+solution: no level can be won with a bus still standing in the lot.
 
-| Chapter | Levels | Mean MDS | Solution density | Max deception | Buses | Surplus | Queue |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 1–25 | 5.5 | 0.90 | 1 | 3.9 | 0.2 | 11 |
-| 2 | 26–50 | 13.2 | 0.73 | 2 | 6.4 | 1.0 | 15 |
-| 3 | 51–75 | 21.6 | 0.61 | 5 | 8.0 | 1.4 | 18 |
-| 4 | 76–100 | 30.0 | 0.54 | 9 | 10.4 | 2.0 | 21 |
-| 5 | 101–125 | 38.3 | 0.47 | 10 | 12.2 | 2.5 | 27 |
-| 6 | 126–150 | 47.4 | 0.34 | 11 | 14.1 | 2.7 | 32 |
-| 7 | 151–175 | 55.6 | 0.28 | 11 | 15.9 | 3.2 | 37 |
-| 8 | 176–200 | 62.7 | 0.24 | 13 | 17.5 | 3.2 | 43 |
+| Chapter | Levels | Mean MDS | Solution density | Max deception | Buses | Queue |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 1–25 | 5.9 | 0.89 | 1 | 4.1 | 24 |
+| 2 | 26–50 | 13.5 | 0.69 | 4 | 6.4 | 35 |
+| 3 | 51–75 | 21.4 | 0.67 | 6 | 8.7 | 44 |
+| 4 | 76–100 | 30.0 | 0.55 | 8 | 11.0 | 53 |
+| 5 | 101–125 | 38.5 | 0.44 | 12 | 13.4 | 71 |
+| 6 | 126–150 | 47.0 | 0.39 | 14 | 15.6 | 84 |
+| 7 | 151–175 | 55.5 | 0.34 | 14 | 17.9 | 107 |
+| 8 | 176–200 | 64.4 | 0.28 | 11 | 20.2 | 121 |
 
 Difficulty rises monotonically on every measure that matters: levels get less
-forgiving (density 0.90 → 0.24) and mistakes take longer to reveal themselves
-(deception 1 → 13). Regenerating the whole ladder takes under two minutes.
+forgiving (density 0.89 → 0.28) and mistakes take longer to reveal themselves
+(deception 1 → 14). 13,506 passengers across the ladder, against 5,100 before
+the capacity change — the tray now reads as a full board rather than a thin row.
+Peak solver cost is 59,889 states, just inside the 60,000 playability gate.
+Regenerating the whole ladder takes about twelve minutes.
 
 ---
 

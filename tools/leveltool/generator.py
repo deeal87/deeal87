@@ -14,10 +14,24 @@ so that a solution exists by construction (CONCEPT.md §5.1):
 The result is guaranteed solvable. How *hard* it is, is then measured by the
 solver, and only candidates that land near the target curve are kept.
 
-Invariant worth knowing: every winning solution dispatches every bus exactly
-once, so the optimal move count always equals the bus count. All the
-difficulty lives in the ORDER, which is why the scoring leans on solution
-density and trap depth rather than path length.
+TWO INVARIANTS, both load-bearing, both asserted by `validate_level`:
+
+1. Every winning solution dispatches every bus exactly once, so the optimal move
+   count always equals the bus count. All the difficulty lives in the ORDER,
+   which is why the scoring leans on solution density and trap depth rather than
+   path length.
+2. **The queue fills every seat on the board exactly.** Total seats across all
+   buses == total seats the queue consumes (a luggage passenger takes two). So
+   when the last passenger boards, there is no bus left standing in the lot.
+
+Invariant 2 replaced an earlier "surplus bus" mechanic: extra buses with no
+passengers, which existed to let a mistake stay hidden. It worked as difficulty
+and failed as a game. A player who clears the queue and still sees buses parked
+in the lot reads that as a bug, not as a trap, and they are right to - nothing
+on screen ever told them those buses were never meant to leave. The deception
+now comes from ORDER instead: dispatching a bus whose colour is a long way down
+the queue parks it in a bay for a long time, and with only three or four bays
+that is quite enough rope. See docs/PROTOTYPE_FINDINGS.md.
 """
 
 from __future__ import annotations
@@ -29,9 +43,14 @@ from curve import PALETTE, GenParams, params_for, target_mds
 from rules import Bus, DIRECTIONS, Level, Passenger, validate_level
 from solver import Analysis, analyse
 
-SMALL_CAPACITY = 3
+# Seats per vehicle. Raised from 3/6: capacity turned out to be an almost free
+# multiplier on the passenger count, because boarding is deterministic - it
+# lengthens the cascade after a dispatch but never branches. Measured at level
+# 200: seats 3/6 gives a 62-ball queue in 22.3k states, seats 6/12 gives a
+# 120-ball queue in 26.7k. The tray got twice as full for a 20% state increase.
+SMALL_CAPACITY = 6
 SMALL_LENGTH = 2
-DECKER_CAPACITY = 6
+DECKER_CAPACITY = 12
 DECKER_LENGTH = 3
 
 
@@ -173,80 +192,20 @@ def _place_buses(
     return placed, occupied
 
 
-def _place_decoys(
-    rng: random.Random,
-    p: GenParams,
-    dispatch: list[tuple[str, int]],
-    placed: dict[int, tuple[tuple, str]],
-    blocked: frozenset[tuple[int, int]],
-) -> list[tuple[tuple, str, str, int]]:
-    """Add surplus buses the intended solution never needs.
-
-    This is what makes a mistake take time to show up. Without surplus, every
-    bus eventually fills and every bay eventually frees, so the only way to
-    lose is instant gridlock - which the player sees immediately. A surplus bus
-    can be sent into a bay and sit there forever, costing a bay silently while
-    play continues. That is the difference between a puzzle that punishes and a
-    puzzle that is hard.
-
-    They are placed off every intended bus's route, so the reference solution
-    still works and the level stays solvable by construction.
-    """
-    if p.decoys == 0:
-        return []
-
-    forbidden = set(blocked)
-    for i, (cells, facing) in placed.items():
-        forbidden.update(cells)
-        forbidden.update(_path_from(p.width, p.height, cells, facing))
-
-    colors_in_play = sorted({c for c, _ in dispatch})
-    decoys: list[tuple[tuple, str, str, int]] = []
-    options = _placements(p.width, p.height, SMALL_LENGTH)
-
-    for _ in range(p.decoys):
-        candidates = []
-        for cells, facing in options:
-            if any(c in forbidden for c in cells):
-                continue
-            path = _path_from(p.width, p.height, cells, facing)
-            # A decoy walled in by cones can never move, which makes it scenery
-            # rather than a trap. It has to be dispatchable to be tempting.
-            if any(c in blocked for c in path):
-                continue
-            # Prefer ones that look dispatchable right now.
-            weight = 4 if not any(c in forbidden for c in path) else 1
-            candidates.append((cells, facing, weight))
-        if not candidates:
-            break
-        total = sum(c[2] for c in candidates)
-        pick = rng.random() * total
-        acc = 0.0
-        for cells, facing, weight in candidates:
-            acc += weight
-            if acc >= pick:
-                decoys.append((cells, facing, rng.choice(colors_in_play), SMALL_CAPACITY))
-                forbidden.update(cells)
-                break
-    return decoys
-
-
 def _assemble(
     rng: random.Random,
     dispatch: list[tuple[str, int]],
     placed: dict[int, tuple[tuple, str]],
-    decoys: list[tuple[tuple, str, str, int]],
 ) -> list[Bus]:
-    """Build the bus list with ids shuffled across intended buses AND decoys.
+    """Build the bus list with ids shuffled.
 
-    Shuffling matters twice over: ids must not encode the dispatch order, and a
-    decoy must not be identifiable as "the one with the high id".
+    Shuffling matters: ids must not encode the dispatch order, or the solution
+    is readable straight off the board.
     """
     entries = [
         (placed[i][0], placed[i][1], dispatch[i][0], dispatch[i][1])
         for i in range(len(dispatch))
     ]
-    entries.extend(decoys)
 
     ids = list(range(1, len(entries) + 1))
     rng.shuffle(ids)
@@ -269,8 +228,7 @@ def generate_candidate(rng: random.Random, p: GenParams) -> Level:
     dispatch, queue = _build_schedule(rng, p)
     blocked = _blocked_cells(rng, p)
     placed, _occupied = _place_buses(rng, p, dispatch, blocked)
-    decoys = _place_decoys(rng, p, dispatch, placed, blocked)
-    buses = _assemble(rng, dispatch, placed, decoys)
+    buses = _assemble(rng, dispatch, placed)
     level = Level(
         id=p.level,
         width=p.width,

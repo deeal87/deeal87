@@ -17,16 +17,16 @@
       "color": "red",
       "cells": [
         [
-          0,
-          2
+          1,
+          1
         ],
         [
-          1,
-          2
+          2,
+          1
         ]
       ],
-      "facing": "right",
-      "capacity": 3
+      "facing": "left",
+      "capacity": 6
     },
     {
       "id": 2,
@@ -34,31 +34,31 @@
       "cells": [
         [
           1,
-          4
+          3
         ],
         [
-          2,
+          1,
           4
         ]
       ],
-      "facing": "left",
-      "capacity": 3
+      "facing": "down",
+      "capacity": 6
     },
     {
       "id": 3,
       "color": "red",
       "cells": [
         [
-          2,
-          3
+          1,
+          2
         ],
         [
-          3,
-          3
+          2,
+          2
         ]
       ],
       "facing": "left",
-      "capacity": 3
+      "capacity": 6
     }
   ],
   "blocked": [],
@@ -67,6 +67,12 @@
       "color": "red"
     },
     {
+      "color": "red"
+    },
+    {
+      "color": "blue"
+    },
+    {
       "color": "blue"
     },
     {
@@ -79,7 +85,28 @@
       "color": "red"
     },
     {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
       "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "blue"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
+    },
+    {
+      "color": "red"
     },
     {
       "color": "red"
