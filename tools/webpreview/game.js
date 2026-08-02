@@ -198,10 +198,15 @@
    * Sized once per level from the FULL queue and then frozen: if the tray
    * shrank as the pile emptied, the lot underneath would jump on every board.
    */
-  const TRAY_MIN_H = 108;   // so a nine-passenger level still reads as a board
+  const TRAY_MIN_H = 84;    // so an 18-passenger level still reads as a board
+  // Ceiling on ball size. Not a fitting constraint - a level with few
+  // passengers could draw them much bigger - but a composition one: big balls
+  // make the tray look sparse and steal the height the lot needs. Small balls
+  // in a full tray read as MORE crowd, which is the honest impression.
+  const TRAY_BALL_MAX = 26;
 
   function trayLayout(n, width, maxH) {
-    for (let d = 44; d >= 11; d--) {
+    for (let d = TRAY_BALL_MAX; d >= 11; d--) {
       // Leave a margin either side, or the ring on the next-to-board ball gets
       // clipped by the tray wall.
       const cols = Math.floor((width - 14) / d);
@@ -404,11 +409,12 @@
 
     const width = wrap.clientWidth || (Math.min(window.innerWidth, 432) - 36);
     if (!app.tray || app.tray.width !== width) {
-      // Late levels carry 120+ passengers and all of them are drawn, so the
-      // tray is allowed a third of the screen. Below that the balls shrink
-      // past the point where colour is comfortable to read.
+      // Under a quarter of the screen. The tray had a third and the lot came
+      // out cramped - vehicles at 32px on the last boards, against a wall of
+      // 30px balls above them. The lot is where the decisions happen, so it
+      // gets the height.
       app.tray = trayLayout(lvl.queue.length, width,
-                            Math.max(110, Math.min(300, window.innerHeight * 0.34)));
+                            Math.max(90, Math.min(196, window.innerHeight * 0.23)));
     }
     const t = app.tray;
     wrap.style.height = t.h + 'px';

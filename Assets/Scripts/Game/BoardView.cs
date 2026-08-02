@@ -23,10 +23,16 @@ namespace SunnyStop.Game
         // §3.1). Row 0 is nearest the stands and is the front of the queue; the
         // pile drains towards the board, so the ordering is still readable but
         // costs a look instead of being free.
-        private const int TrayColumns = 12;
+        // Fifteen across, matching the browser build. Small balls in a full tray
+        // read as more crowd than big ones in a sparse tray, and they leave the
+        // lot the height it needs - the lot is where the decisions happen.
+        private const int TrayColumns = 15;
         private const float TrayWidth = 6.4f;
         private const float TraySpacing = TrayWidth / TrayColumns;
         private const float TrayRowPitch = TraySpacing * 0.86f;
+        // Balls very nearly touch, so the gaps read as shadow rather than as
+        // floor. A loose pile looks pastel however saturated the fill is.
+        private const float BallDiameter = TraySpacing * 0.96f;
 
         public float DriveOutDuration = 0.34f;
         public float DockDuration = 0.30f;
@@ -376,7 +382,8 @@ namespace SunnyStop.Game
                 var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 go.name = $"Passenger {i} ({passenger.Color})";
                 go.transform.SetParent(_root, false);
-                go.transform.localScale = Vector3.one * (passenger.Luggage ? 0.34f : 0.28f);
+                go.transform.localScale =
+                    Vector3.one * (passenger.Luggage ? BallDiameter * 1.15f : BallDiameter);
 
                 Vector3 slot = QueuePosition(shown);
                 slot.x += Jitter(_level.Id, i, 1) * TraySpacing * 0.12f;
