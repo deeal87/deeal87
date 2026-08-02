@@ -667,19 +667,42 @@ This shortens the plan in §12 by roughly four weeks and removes the single larg
 
 Built and verified:
 
-- **Level generator, solver and difficulty scorer** (`tools/leveltool/`) — 30 tests green
-- **12 levels baked** (1–10 plus previews of 50 and 120), every one proven solvable and
-  within 6 MDS points of the target curve
+- **Level generator, solver and difficulty scorer** (`tools/leveltool/`) — 36 tests green
+- **All 200 levels baked**, every one proven solvable in three independent rule engines
+  (Python, JavaScript, C#) and all 200 within 6 MDS points of the target curve
 - **Unity/C# prototype** — rules, on-device solver powering hints and the instant rewind
-  offer, postcard screen, colour-blind palettes, runtime-built scene
+  offer, start menu, postcard screen, colour-blind palettes, runtime-built scene
+- **Browser preview** (`tools/webpreview/`) — the whole game as one self-contained HTML
+  file: start menu, board, route map, postcard album, 200 levels, 240 cards
 - **240 German postcards** across six situational categories, all three tones covered
 
-Not built: art, audio, the map, the album, the shop, and the remaining 188 levels.
+Not built: art, audio, the shop, English postcards, and — in the Unity build only — the
+route map and album screens, which exist in the browser preview.
 
 One finding materially affects the plan: with only the three mechanics implemented so far,
 measured difficulty plateaus from about level 90 and level 200 reaches roughly half its
 target. The mechanic rollout in §4 is therefore the difficulty engine, not decoration.
 Full write-up in `docs/PROTOTYPE_FINDINGS.md`.
+
+### 14.1 The start screen
+
+The menu commits to **one visual world rather than following the viewer's theme**: the
+terminal at night, seen from outside, before you take up the dispatcher's desk. Deep
+blue-black ground, amber LED, a single cyan accent, and a road running to the horizon.
+Stepping into a level then reads as a change of *place* into the warm daylight board,
+which is the point.
+
+The title is not set in a typeface. It is **rastered as an LED dot matrix on canvas** —
+text is rendered into a small offscreen buffer at 4× the lamp grid, then each 4×4 block is
+averaged into one lamp. Averaging rather than point-sampling is what keeps diagonals from
+breaking up. Unlit lamps are drawn too, faintly: the dark grid is what says *this is a
+board with lamps on it* rather than *this is glowing text*. It powers on with a single
+left-to-right wipe, and not at all under `prefers-reduced-motion`.
+
+Every row on the screen goes somewhere real — resume, route map, album, message tone —
+and each carries live data from the player's own save. Nothing on it is a button for a
+feature that does not exist: the Unity build passes `null` for the two screens it has not
+got yet, and those rows are omitted rather than shipped dead.
 
 ---
 

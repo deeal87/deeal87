@@ -574,6 +574,237 @@ html { -webkit-text-size-adjust: 100%; background: var(--page); }
   text-align: center; line-height: 1.5; margin: 0.15rem 0 0;
 }
 
+/* ---- start menu: the night terminal -------------------------------------- */
+
+/* This screen deliberately commits to one visual world instead of following
+   the viewer's theme. It is the terminal at night, seen from outside, before
+   you take up the dispatcher's desk - so it is dark in both themes on purpose,
+   and the warm daylight board that follows lands as a change of place.
+   Tokens are scoped here so they cannot leak into the game's palette. */
+.menu-layer {
+  --void: #070B12;        /* blue-biased night, not a neutral black */
+  --panel: #0E1622;
+  --led: #FFB300;         /* the real amber of a departure board */
+  --beam: #35E0D0;        /* headlight cyan - the one bold spend */
+  --rail: #1D2B3D;
+  --dim: #7A8DA4;
+  --glass: rgba(19, 31, 47, 0.66);
+
+  position: fixed; inset: 0; z-index: 80;
+  background:
+    radial-gradient(120% 70% at 50% 104%, rgba(53, 224, 208, 0.16), transparent 62%),
+    radial-gradient(90% 50% at 50% -8%, rgba(255, 179, 0, 0.10), transparent 70%),
+    var(--void);
+  color: #E8EEF6;
+  font-family: var(--display);
+  overflow: hidden;
+  display: flex; flex-direction: column; align-items: stretch;
+  justify-content: flex-start;
+  padding: max(1.4rem, env(safe-area-inset-top)) 1.1rem 1.2rem;
+  gap: 1.1rem;
+  animation: menuIn 420ms cubic-bezier(.2,.8,.3,1);
+}
+.menu-top, .menu-mid { display: flex; flex-direction: column; gap: 0.55rem; }
+.menu-mid { gap: 0.75rem; }
+
+/* Two facts from the player's own progress, in the space under the sign. A
+   terminal board is never blank there, and neither is this. */
+.menu-brief { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-top: 0.3rem; }
+.menu-brief div {
+  border: 1px solid var(--rail); border-radius: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  background: rgba(19, 31, 47, 0.42);
+  display: flex; flex-direction: column; gap: 0.18rem; min-width: 0;
+}
+.menu-brief small { font-size: 0.5rem; letter-spacing: 0.2em; color: var(--dim); }
+.menu-brief b {
+  font-size: 0.8rem; letter-spacing: 0.03em; font-weight: 700; color: #E8EEF6;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+@keyframes menuIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Night road running to the horizon. Ambient only - never in front of a control.
+   Selector is deliberately two classes deep: `.menu-layer > *` below sets
+   position on every child, and a single-class rule here would lose the tie and
+   drop the horizon into the flex flow as a 46%-tall block. */
+.menu-layer .menu-horizon {
+  position: absolute; left: -20%; right: -20%; bottom: -2%; height: 46%;
+  pointer-events: none; z-index: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 43px, rgba(53,224,208,.22) 43px 44px),
+    repeating-linear-gradient(0deg,  transparent 0 43px, rgba(53,224,208,.13) 43px 44px);
+  transform: perspective(200px) rotateX(70deg);
+  transform-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(#000 0%, rgba(0,0,0,.35) 55%, transparent 88%);
+  mask-image: linear-gradient(#000 0%, rgba(0,0,0,.35) 55%, transparent 88%);
+  animation: horizonDrift 7s linear infinite;
+}
+@keyframes horizonDrift { to { background-position: 0 44px, 0 44px; } }
+.menu-layer > * { position: relative; z-index: 1; }
+
+/* The destination blind, in its bezel. */
+.blind-box {
+  width: 100%;
+  border-radius: 0.9rem;
+  padding: 0.7rem;
+  background: linear-gradient(180deg, #1B2635 0%, #101823 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -2px 0 rgba(0,0,0,.5),
+    0 12px 30px rgba(0,0,0,.55);
+  position: relative;
+}
+/* Four mounting screws - the detail that makes it a fitted object rather than
+   a rounded rectangle. One element, four gradients, no height arithmetic. */
+.blind-box::before {
+  content: ""; position: absolute; inset: 5px; pointer-events: none;
+  border-radius: 0.6rem;
+  background:
+    radial-gradient(circle 2px at 2px 2px, rgba(255,255,255,.22) 62%, transparent 63%),
+    radial-gradient(circle 2px at calc(100% - 2px) 2px, rgba(255,255,255,.22) 62%, transparent 63%),
+    radial-gradient(circle 2px at 2px calc(100% - 2px), rgba(255,255,255,.22) 62%, transparent 63%),
+    radial-gradient(circle 2px at calc(100% - 2px) calc(100% - 2px), rgba(255,255,255,.22) 62%, transparent 63%);
+}
+.blind-screen {
+  display: block; width: 100%; height: 96px;
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(90% 120% at 50% 0%, rgba(255,179,0,.07), transparent 70%),
+    #05080D;
+  box-shadow: inset 0 0 26px rgba(0,0,0,.9);
+}
+.blind-strap {
+  width: 100%;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 0.75rem;
+  padding: 0 0.25rem;
+  font-size: 0.58rem; letter-spacing: 0.22em; color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.blind-strap b { color: var(--beam); font-weight: 700; letter-spacing: 0.22em; }
+
+/* The departure call: one obvious thing to do. */
+.menu-go {
+  width: 100%; border: none; cursor: pointer; text-align: left;
+  border-radius: 0.9rem; padding: 0.95rem 1.1rem;
+  display: flex; align-items: center; gap: 0.9rem;
+  color: #1A1206;
+  background: linear-gradient(180deg, #FFD24D 0%, var(--led) 62%, #D98A00 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 0 -3px 0 rgba(0,0,0,.22),
+    0 0 0 1px rgba(255,179,0,.35),
+    0 10px 34px rgba(255,179,0,.24);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease, box-shadow 200ms ease;
+}
+.menu-go:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -3px 0 rgba(0,0,0,.22), 0 0 0 1px rgba(255,179,0,.5), 0 12px 44px rgba(255,179,0,.4); }
+.menu-go:active { transform: translateY(2px); }
+.menu-go .go-mark {
+  flex: 0 0 auto; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(26,18,6,.14);
+  box-shadow: inset 0 0 0 1px rgba(26,18,6,.22);
+}
+.menu-go .go-mark svg { width: 44%; height: 44%; fill: #1A1206; }
+.menu-go .go-text { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.menu-go .go-kicker {
+  font-size: 0.56rem; letter-spacing: 0.22em; opacity: .72;
+}
+.menu-go .go-title {
+  font-size: 1.22rem; font-weight: 800; letter-spacing: 0.02em; line-height: 1.1;
+}
+
+/* Secondary destinations, as rows on a board. */
+.menu-rows { width: 100%; display: flex; flex-direction: column; gap: 0.45rem; }
+.menu-row {
+  width: 100%; cursor: pointer; text-align: left;
+  display: grid; grid-template-columns: 3.2rem 1fr auto; align-items: center;
+  gap: 0.75rem;
+  border: 1px solid var(--rail); border-radius: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  color: #E8EEF6;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 160ms ease, background 160ms ease, transform 120ms ease;
+}
+.menu-row:hover { border-color: var(--beam); background: rgba(28,46,66,.72); }
+.menu-row:active { transform: translateY(1px); }
+.menu-row .row-no {
+  font-size: 0.9rem; font-weight: 800; color: var(--led);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+}
+.menu-row .row-name { font-size: 0.9rem; font-weight: 700; letter-spacing: 0.03em; }
+.menu-row .row-note {
+  font-size: 0.58rem; letter-spacing: 0.16em; color: var(--dim);
+  text-align: right; white-space: nowrap;
+}
+.menu-row.is-off .row-no { color: var(--dim); }
+
+/* Progress strip. */
+/* All the slack collects here, above the progress strip - which is exactly
+   where the road runs, so the empty space reads as distance rather than as a
+   gap somebody forgot to fill. */
+.menu-status { width: 100%; display: flex; flex-direction: column; gap: 0.4rem; margin-top: auto; }
+.menu-meter { height: 4px; border-radius: 3px; background: rgba(255,255,255,.09); overflow: hidden; }
+.menu-meter i {
+  display: block; height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--beam), var(--led));
+  box-shadow: 0 0 12px rgba(255,179,0,.6);
+  transition: width 700ms cubic-bezier(.2,.8,.3,1);
+}
+.menu-legend {
+  display: flex; justify-content: space-between;
+  font-size: 0.56rem; letter-spacing: 0.18em; color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- album ---- */
+
+.album-layer {
+  position: fixed; inset: 0; z-index: 85;
+  background: var(--void, #070B12);
+  color: #E8EEF6; font-family: var(--display);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 1.1rem 1.1rem 2.4rem;
+  animation: menuIn 300ms ease;
+}
+.album-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.album-head h2 {
+  flex: 1; margin: 0; font-size: 0.9rem; font-weight: 800;
+  letter-spacing: 0.2em; color: #FFB300;
+}
+.album-back {
+  border: 1px solid #1D2B3D; background: rgba(19,31,47,.66); color: #E8EEF6;
+  border-radius: 0.6rem; padding: 0.5rem 0.8rem; cursor: pointer;
+  font-family: var(--display); font-size: 0.68rem; letter-spacing: 0.12em; font-weight: 700;
+}
+.album-back:hover { border-color: #35E0D0; }
+.album-grid { display: grid; gap: 0.7rem; }
+/* The cards keep the postcards' own warmth against the dark terminal. */
+.album-card {
+  background: #FDFCFA; color: #1B1E24;
+  border-radius: 0.8rem; border-top: 5px solid #E08A1E;
+  padding: 1rem 1.1rem 0.8rem;
+  font-family: var(--card);
+  box-shadow: 0 10px 26px rgba(0,0,0,.45);
+}
+.album-card q { font-size: 1rem; line-height: 1.5; quotes: "„" "“"; }
+.album-card .who {
+  display: block; margin-top: 0.6rem;
+  font-family: var(--display); font-size: 0.54rem; letter-spacing: 0.16em;
+  color: #7A8DA4; text-transform: uppercase;
+}
+.album-empty {
+  border: 1px dashed #1D2B3D; border-radius: 0.8rem;
+  padding: 2rem 1.2rem; text-align: center; color: #7A8DA4;
+  font-size: 0.85rem; line-height: 1.6;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bus, .rider, .flyer, .postcard, .postcard-layer, .stop { transition: none !important; animation: none !important; }
+  .menu-horizon, .menu-layer, .album-layer { animation: none !important; }
+  .menu-meter i { transition: none !important; }
 }

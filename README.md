@@ -82,16 +82,23 @@ Runs on every push (`.github/workflows/ci.yml`).
 Pre-production prototype (M0).
 
 - **All 200 levels built and verified** — every one proven solvable, mean drift
-  from the target curve 1.5 points, 197 of 200 within 6. Regenerates in under
-  two minutes.
-- Level generator, solver and difficulty scorer: **working**, 35 tests green
+  from the target curve 1.3 points, **200 of 200** within 6. Regenerates in
+  about twenty minutes.
+- Level generator, solver and difficulty scorer: **working**, 36 tests green
 - Both C# assemblies compile, and the C# engine replays all 200 Python-verified
   solutions move-for-move — checked headlessly, no Unity licence needed
-- Unity prototype: rules, solver-backed hints, free rewind, postcard screen, colour-blind palettes
+- Unity prototype: rules, solver-backed hints, free rewind, start menu, postcard
+  screen, colour-blind palettes
+- Browser preview: the whole game in one self-contained HTML file — start menu,
+  board, route map, postcard album, all 200 levels
 - 240 German postcards across six situational categories, all three tones covered
 
 Difficulty rises on both measures that matter: levels get steadily less forgiving
-(solution density 0.90 → 0.24 across the eight chapters) and a wrong move takes
-steadily longer to reveal itself (1 move → 13).
+(solution density 0.83 → 0.28 across the eight chapters) and a wrong move takes
+steadily longer to reveal itself (4 moves → 14).
 
-Not built yet: art, audio, the map, the album and the shop.
+Every bus on every board is part of the solution, enforced per colour by
+`validate_level`: no level can be won with a bus still parked in the lot.
+
+Not built yet: art, audio, the shop, English postcards, and — in the Unity build
+only — the route map and album screens.

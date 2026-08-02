@@ -20,6 +20,7 @@ namespace SunnyStop.Game
         private const string KeySkipped = "ss.skipped.";
         private const string KeyRecentCards = "ss.recentCards";
         private const string KeyAlbum = "ss.album";
+        private const string KeyCleared = "ss.cleared";
         private const string KeyTone = "ss.tone";
         private const string KeyColorMode = "ss.colorMode";
         private const string KeyLastPlayed = "ss.lastPlayed";
@@ -102,6 +103,27 @@ namespace SunnyStop.Game
             PlayerPrefs.SetString(KeyLastPlayed, DateTime.UtcNow.ToString("o"));
 
         public static void Flush() => PlayerPrefs.Save();
+
+        /// <summary>
+        /// Levels actually won, as a set of ids.
+        ///
+        /// Deliberately not derived from <see cref="HighestLevelReached"/>: a
+        /// skipped level advances the furthest-reached marker without ever being
+        /// solved, so counting from it would tell the player on the menu that
+        /// they had cleared levels they had not.
+        /// </summary>
+        public static List<string> ClearedLevels() => Split(PlayerPrefs.GetString(KeyCleared, ""));
+
+        public static int ClearedCount() => ClearedLevels().Count;
+
+        public static void MarkCleared(int level)
+        {
+            string id = level.ToString();
+            List<string> cleared = ClearedLevels();
+            if (cleared.Contains(id)) return;
+            cleared.Add(id);
+            PlayerPrefs.SetString(KeyCleared, string.Join(",", cleared));
+        }
 
         private static List<string> Split(string raw) =>
             string.IsNullOrEmpty(raw)

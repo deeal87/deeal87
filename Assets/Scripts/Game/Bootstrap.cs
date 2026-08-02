@@ -50,7 +50,19 @@ namespace SunnyStop.Game
 
             var flow = gameObject.AddComponent<GameFlow>();
             flow.Initialise(board, hud, postcard);
+
+            // The board is built behind the menu, so the departure call is
+            // instant rather than a second load screen.
             flow.StartFromSave();
+
+            var menu = new GameObject("Menu").AddComponent<MenuView>();
+            menu.transform.SetParent(transform, false);
+            // The route map and the album screens are not built in the Unity
+            // prototype yet. Passing null omits those rows entirely rather than
+            // shipping buttons that go nowhere; the browser build has both, and
+            // they land here when the screens do.
+            menu.Initialise(onPlay: flow.LoadLevel, onMap: null, onAlbum: null);
+            menu.Show();
         }
 
         private void SetUpCamera()

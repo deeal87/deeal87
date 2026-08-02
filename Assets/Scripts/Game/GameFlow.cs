@@ -223,6 +223,7 @@ namespace SunnyStop.Game
                 daysSinceLastPlay: SaveGame.DaysSinceLastPlay());
 
             SaveGame.ClearAttempts(_levelNumber);
+            SaveGame.MarkCleared(_levelNumber);
             SaveGame.TouchLastPlayed();
             SaveGame.Flush();
 

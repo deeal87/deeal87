@@ -88,6 +88,9 @@ namespace UnityEngine
         public static int Clamp(int v, int lo, int hi) => v;
         public static float Max(float a, float b) => a;
         public static int Max(int a, int b) => a;
+        public static float Min(float a, float b) => a;
+        public static int Min(int a, int b) => a;
+        public static int CeilToInt(float f) => 0;
     }
 
     public class Transform : Component, IEnumerable
@@ -248,6 +251,8 @@ namespace UnityEngine
         public static void Save() { }
     }
 
+    public enum FontStyle { Normal, Bold, Italic, BoldAndItalic }
+
     public enum TextAnchor
     {
         UpperLeft, UpperCenter, UpperRight,
@@ -315,6 +320,7 @@ namespace UnityEngine
             public HorizontalWrapMode horizontalOverflow { get; set; }
             public VerticalWrapMode verticalOverflow { get; set; }
             public bool supportRichText { get; set; }
+            public FontStyle fontStyle { get; set; }
             public RectTransform rectTransform { get; }
         }
 

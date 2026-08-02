@@ -669,7 +669,12 @@
     keep.addEventListener('click', (ev) => {
       ev.stopPropagation();
       const album = load().album || [];
-      if (!album.includes(card.id)) save({ album: album.concat(card.id) });
+      // Store when and where it was earned, not just which card. "Level 12,
+      // 2. August" is something the player recognises; the card's internal
+      // category is not.
+      if (!album.some((e) => (e && typeof e === 'object' ? e.id : e) === card.id)) {
+        save({ album: album.concat({ id: card.id, level: app.level.id, at: Date.now() }) });
+      }
       keep.textContent = 'Im Album ✓';
       keep.disabled = true;
     });
@@ -856,6 +861,284 @@
     if (marker) marker.scrollIntoView({ block: 'center' });
   }
 
+  // ---- the destination blind --------------------------------------------- //
+
+  /**
+   * Renders text as an LED dot matrix on a canvas.
+   *
+   * The title is not set in a typeface, it is *rastered* - which is what a real
+   * departure board does, and what makes the menu read as a piece of terminal
+   * equipment rather than a title screen with a glow filter. Drawn rather than
+   * hand-authored as SVG so the text can be any string and any width.
+   *
+   * Works by rendering the text into a small offscreen canvas at 4x the dot
+   * grid, then averaging each 4x4 block into one lamp. Averaging rather than
+   * point-sampling is what keeps diagonals from breaking up.
+   */
+  function drawBlind(canvas, text, progress) {
+    const pitch = 5;                       // CSS px between lamp centres
+    const w = canvas.clientWidth || 300;
+    const h = canvas.clientHeight || 88;
+    if (!w || !h) return;
+
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    const cols = Math.floor((w - 10) / pitch);
+    const rows = Math.floor((h - 10) / pitch);
+    if (cols < 8 || rows < 5) return;
+
+    const S = 4;
+    const off = document.createElement('canvas');
+    off.width = cols * S; off.height = rows * S;
+    const oc = off.getContext('2d');
+    oc.fillStyle = '#000';
+    oc.fillRect(0, 0, off.width, off.height);
+    oc.fillStyle = '#fff';
+    oc.textAlign = 'center';
+    oc.textBaseline = 'middle';
+
+    const face = '900 SIZEpx ui-sans-serif, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif';
+    let size = rows * S;
+    while (size > 6) {
+      oc.font = face.replace('SIZE', String(size));
+      const m = oc.measureText(text);
+      if (m.width <= off.width - S * 2 && size <= rows * S * 0.92) break;
+      size -= 1;
+    }
+    oc.font = face.replace('SIZE', String(size));
+    oc.fillText(text, off.width / 2, off.height / 2 + S * 0.3);
+    const px = oc.getImageData(0, 0, off.width, off.height).data;
+
+    const x0 = (w - cols * pitch) / 2 + pitch / 2;
+    const y0 = (h - rows * pitch) / 2 + pitch / 2;
+    const lit = Math.max(0, Math.min(1, progress === undefined ? 1 : progress));
+
+    for (let cy = 0; cy < rows; cy++) {
+      for (let cx = 0; cx < cols; cx++) {
+        let sum = 0;
+        for (let sy = 0; sy < S; sy++) {
+          const rowBase = ((cy * S + sy) * off.width + cx * S) * 4;
+          for (let sx = 0; sx < S; sx++) sum += px[rowBase + sx * 4];
+        }
+        const on = sum / (S * S) > 118 && cx < cols * lit;
+        const x = x0 + cx * pitch;
+        const y = y0 + cy * pitch;
+
+        // Unlit lamps are drawn too: the dark grid is what says "this is a
+        // board with lamps on it" rather than "this is glowing text".
+        ctx.beginPath();
+        ctx.arc(x, y, on ? pitch * 0.38 : pitch * 0.16, 0, Math.PI * 2);
+        ctx.shadowBlur = on ? 7 : 0;
+        ctx.shadowColor = 'rgba(255,179,0,.85)';
+        ctx.fillStyle = on ? '#FFC22E' : 'rgba(255,200,120,.075)';
+        ctx.fill();
+      }
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  /** Wipes the board on from the left, once, like a sign powering up. */
+  function powerOnBlind(canvas, text) {
+    const reduce = window.matchMedia
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { drawBlind(canvas, text, 1); return; }
+    const started = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - started) / 620);
+      drawBlind(canvas, text, t);
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---- start menu -------------------------------------------------------- //
+
+  const TONES = [
+    ['warm', 'WARM'],
+    ['playful', 'VERSPIELT'],
+    ['off', 'AUS'],
+  ];
+
+  function showMenu() {
+    const saved = load();
+    const beaten = new Set(saved.beaten || []);
+    const album = saved.album || [];
+    const resume = Math.min(200, Math.max(1, saved.current || 1));
+    // Not `!saved.current`: boot() builds the board behind the menu, and that
+    // writes `current` before this ever runs. "Never won anything, still on
+    // the first level" is the honest test for a first visit.
+    const isNew = beaten.size === 0 && resume === 1;
+
+    const layer = el('div', 'menu-layer');
+    layer.appendChild(el('div', 'menu-horizon'));
+
+    // Three groups, so the layer's space-between has something to distribute:
+    // the sign up top, the controls in the middle, progress on the floor.
+    const top = el('div', 'menu-top');
+    const mid = el('div', 'menu-mid');
+
+    // --- the blind ---
+    const box = el('div', 'blind-box');
+    const screen = el('canvas', 'blind-screen');
+    screen.setAttribute('role', 'img');
+    screen.setAttribute('aria-label', 'Sunny Stop');
+    box.appendChild(screen);
+    top.appendChild(box);
+
+    const strap = el('div', 'blind-strap');
+    strap.appendChild(el('span', null, 'LINIE 200'));
+    strap.appendChild(el('b', null, 'TERMINAL · BETRIEB'));
+    top.appendChild(strap);
+
+    // Where you are on the route, from the player's own save.
+    const chapter = Math.min(8, Math.floor((resume - 1) / 25) + 1);
+    const milestone = Math.min(200, Math.ceil(resume / 25) * 25);
+    const brief = el('div', 'menu-brief');
+    for (const [label, value] of [
+      ['ABSCHNITT', `${chapter} · ${CHAPTERS[chapter - 1].name}`],
+      ['NÄCHSTER MEILENSTEIN', `Level ${milestone}`],
+    ]) {
+      const cell = el('div');
+      cell.appendChild(el('small', null, label));
+      cell.appendChild(el('b', null, value));
+      brief.appendChild(cell);
+    }
+    top.appendChild(brief);
+    layer.appendChild(top);
+
+    // --- the one obvious thing to do ---
+    const go = el('button', 'menu-go');
+    go.type = 'button';
+    const mark = el('div', 'go-mark');
+    mark.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+    go.appendChild(mark);
+    const goText = el('div', 'go-text');
+    goText.appendChild(el('span', 'go-kicker', isNew ? 'ERSTE FAHRT' : 'ABFAHRT'));
+    goText.appendChild(el('span', 'go-title',
+      isNew ? 'Losfahren' : `Weiter · Level ${resume}`));
+    go.appendChild(goText);
+    go.addEventListener('click', () => { layer.remove(); loadLevel(resume); });
+    mid.appendChild(go);
+
+    // --- secondary destinations ---
+    const rows = el('div', 'menu-rows');
+
+    rows.appendChild(menuRow('200', 'Alle Haltestellen',
+      `${beaten.size} GELÖST`, () => { layer.remove(); showMap(); }));
+
+    rows.appendChild(menuRow(String(album.length).padStart(3, '0'), 'Postkarten-Album',
+      album.length ? 'ÖFFNEN' : 'NOCH LEER',
+      () => showAlbum(), album.length === 0));
+
+    const toneRow = menuRow('TON', 'Worte nach dem Sieg', toneLabel(saved.tone), null);
+    toneRow.addEventListener('click', () => {
+      const i = TONES.findIndex((t) => t[0] === (load().tone || 'warm'));
+      const next = TONES[(i + 1) % TONES.length];
+      save({ tone: next[0] });
+      toneRow.querySelector('.row-note').textContent = next[1];
+    });
+    rows.appendChild(toneRow);
+    mid.appendChild(rows);
+    layer.appendChild(mid);
+
+    // --- progress ---
+    const status = el('div', 'menu-status');
+    const meter = el('div', 'menu-meter');
+    const fill = el('i');
+    fill.style.width = '0%';
+    meter.appendChild(fill);
+    status.appendChild(meter);
+    const legend = el('div', 'menu-legend');
+    legend.appendChild(el('span', null, `${beaten.size} / 200 GELÖST`));
+    legend.appendChild(el('span', null, `${album.length} POSTKARTEN`));
+    status.appendChild(legend);
+    layer.appendChild(status);
+
+    document.body.appendChild(layer);
+    powerOnBlind(screen, 'SUNNY STOP');
+    requestAnimationFrame(() => {
+      fill.style.width = Math.max(1.5, (beaten.size / 200) * 100) + '%';
+    });
+
+    const onResize = () => drawBlind(screen, 'SUNNY STOP', 1);
+    window.addEventListener('resize', onResize);
+    const observer = new MutationObserver(() => {
+      if (!document.body.contains(layer)) {
+        window.removeEventListener('resize', onResize);
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true });
+  }
+
+  function toneLabel(tone) {
+    const found = TONES.find((t) => t[0] === (tone || 'warm'));
+    return found ? found[1] : 'WARM';
+  }
+
+  function menuRow(no, name, note, act, muted) {
+    const row = el('button', 'menu-row' + (muted ? ' is-off' : ''));
+    row.type = 'button';
+    row.appendChild(el('span', 'row-no', no));
+    row.appendChild(el('span', 'row-name', name));
+    row.appendChild(el('span', 'row-note', note));
+    if (act) row.addEventListener('click', act);
+    return row;
+  }
+
+  // ---- album ------------------------------------------------------------- //
+
+  function showAlbum() {
+    const kept = load().album || [];
+    const layer = el('div', 'album-layer');
+
+    const head = el('div', 'album-head');
+    head.appendChild(el('h2', null, 'POSTKARTEN'));
+    const back = el('button', 'album-back', 'Zurück');
+    back.type = 'button';
+    back.addEventListener('click', () => layer.remove());
+    head.appendChild(back);
+    layer.appendChild(head);
+
+    const grid = el('div', 'album-grid');
+    if (!kept.length) {
+      grid.appendChild(el('div', 'album-empty',
+        'Noch keine Karte behalten. Nach einem gewonnenen Level auf „Behalten“ tippen — dann liegt sie hier.'));
+    }
+    // Newest first: the one you just kept is the one you want to re-read.
+    for (const entry of kept.slice().reverse()) {
+      // Older saves stored a bare id; both shapes have to keep working or a
+      // returning player loses their album. The type test is explicit on
+      // purpose: `someString.at` is String.prototype.at, which is truthy, so a
+      // duck-typed check reads every legacy entry as a dated record and prints
+      // "Invalid Date".
+      const record = entry && typeof entry === 'object' ? entry : null;
+      const id = record ? record.id : entry;
+      const card = CARDS.find((c) => c.id === id);
+      if (!card) continue;
+      const node = el('div', 'album-card');
+      const quote = el('q');
+      quote.textContent = card.text;
+      node.appendChild(quote);
+
+      const parts = [];
+      if (record && record.level) parts.push(`Level ${record.level}`);
+      if (record && record.at) {
+        parts.push(new Date(record.at).toLocaleDateString('de-DE',
+          { day: 'numeric', month: 'long', year: 'numeric' }));
+      }
+      node.appendChild(el('span', 'who', parts.join(' · ') || 'Behalten'));
+      grid.appendChild(node);
+    }
+    layer.appendChild(grid);
+    document.body.appendChild(layer);
+  }
+
   // ---- boot -------------------------------------------------------------- //
 
   // Two controls appear twice - undo in the floating HUD and again in the dock,
@@ -865,6 +1148,7 @@
     undo: undo,
     restart: () => loadLevel(app.level.id),
     map: showMap,
+    menu: showMenu,
   };
 
   function boot() {
@@ -877,7 +1161,10 @@
       app.tray = null;                   // re-pack the pile for the new width
       render();
     });
+    // The board is built behind the menu, so "Weiter" is instant rather than a
+    // second load screen.
     loadLevel(load().current || 1);
+    showMenu();
   }
 
   if (document.readyState === 'loading') {
