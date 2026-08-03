@@ -152,7 +152,7 @@ uppercase labels in the menu need to stop looking loose.
 
 Honest list. None of this is stubbed out anywhere — it simply does not exist.
 
-- **Music and ambience.** The *effects* are done (§3.6); the warm acoustic bed
+- **Music and ambience.** The *effects* are done (§3.5); the warm acoustic bed
   per chapter is not. This is the part synthesis would do badly — a generated
   pad sounds like a generated pad — so it wants a composer or licensed loops.
   Budget one loop per chapter, layered stems so it does not fatigue.
