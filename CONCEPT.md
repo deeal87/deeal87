@@ -581,9 +581,28 @@ preview (`Palette.DefaultColors` ↔ `COLORS` in `game.js`) so the two cannot dr
 **Postcards:** a distinctly different, hand-made illustration style — gouache/riso texture,
 hand-lettered headline. The contrast with the clean 3D board is what makes the moment land.
 
-**Audio:** warm acoustic ambience per chapter, no loop fatigue (layered stems). SFX are
-tuned like an instrument, boarding notes form a rising pentatonic melody. Everything
-duckable; the game is fully playable silent, with haptics carrying the feedback.
+**Audio:** the effects are **synthesised in code**, not shipped as files (`SfxSynth.cs`,
+mirrored in `tools/webpreview/sound.js`). That is not thrift, it is what the design
+requires: boarding notes climb a C major pentatonic once per passenger, a cascade runs up
+to twelve long, and as `base × ratio[i]` that is in tune by construction where twelve
+samples are twelve chances to drift. Pentatonic specifically because no two notes in it
+can clash — the *player* chooses the boarding order, so every possible run has to be
+consonant.
+
+Three rules the sound obeys, all in `AudioDirector.cs`:
+
+- **The chain resets every move**, so filling a twelve-seat double-decker in one go plays
+  a long run and feels like the achievement it is.
+- **The postcard is nearly silent** — one soft bell at a third of the mix, and the board
+  is held quiet while it is up. A fanfare there would turn a kind word into a payout
+  jingle, which is the register this whole game is defined against (§6).
+- **The refusal is a shake of the head, not a buzzer**, and the free-rewind offer is a
+  falling two-note figure rather than an alarm. The player is at their worst moment; the
+  game is offering to help.
+
+Still to come: warm acoustic ambience per chapter with layered stems, which is the part
+synthesis does badly and wants a composer. Everything duckable; the game is fully playable
+silent, with haptics carrying the feedback.
 
 ---
 

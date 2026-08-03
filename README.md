@@ -100,7 +100,11 @@ steadily longer to reveal itself (4 moves → 14).
 Every bus on every board is part of the solution, enforced per colour by
 `validate_level`: no level can be won with a bus still parked in the lot.
 
-Not built yet: art, audio, the shop, English postcards, cloud save.
+Sound effects are synthesised in code — no files, no licensing, and the
+boarding notes climb a pentatonic scale so a full cascade plays a run.
+
+Not built yet: art, music and ambience, haptics, the shop, English
+postcards, cloud save.
 
 **Finishing it in Unity:** [`docs/UNITY_HANDOVER.md`](docs/UNITY_HANDOVER.md) —
 what is done, what is a runtime stand-in waiting for prefabs, what does not

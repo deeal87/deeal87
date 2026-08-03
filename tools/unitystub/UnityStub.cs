@@ -275,6 +275,30 @@ namespace UnityEngine
 
     public class AudioListener : Behaviour { }
 
+    public sealed class AudioClip : Object
+    {
+        public static AudioClip Create(string name, int lengthSamples, int channels,
+                                       int frequency, bool stream) => null;
+        public bool SetData(float[] data, int offsetSamples) => true;
+        public int samples => 0;
+        public float length => 0f;
+    }
+
+    public class AudioSource : Behaviour
+    {
+        public AudioClip clip { get; set; }
+        public bool playOnAwake { get; set; }
+        public bool loop { get; set; }
+        public float volume { get; set; }
+        public float pitch { get; set; }
+        public float spatialBlend { get; set; }
+        public bool isPlaying => false;
+        public void Play() { }
+        public void Stop() { }
+        public void PlayOneShot(AudioClip clip) { }
+        public void PlayOneShot(AudioClip clip, float volumeScale) { }
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class RequireComponent : Attribute { public RequireComponent(Type type) { } }
 

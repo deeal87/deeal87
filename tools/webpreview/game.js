@@ -490,6 +490,7 @@
     });
     document.body.appendChild(flyer);
     rider.style.opacity = '0';
+    Sfx.board();
 
     // A little hop on the way in - the arc is what makes it feel cheerful.
     const dx = to.left + (to.width - from.width) / 2 - from.left;
@@ -532,6 +533,7 @@
     }
     const refusal = E.canDispatch(app.level, app.state, busId);
     if (refusal) {
+      Sfx.play('refused');
       node.classList.remove('refused');
       void node.offsetWidth;
       node.classList.add('refused');
@@ -548,6 +550,10 @@
     app.history.push(app.state);
     hideBanner();
     setDisabled('undo', true);
+    // Each move starts a fresh run up the scale, so a big cascade sounds like
+    // one - which is exactly what it is.
+    Sfx.resetChain();
+    Sfx.play('dispatch');
 
     const bus = app.level.byId.get(busId);
     const events = [];
@@ -560,6 +566,7 @@
 
     app.state = next;
     renderLot();
+    Sfx.play('dock');
 
     // 2. Arrive in the bay with every seat still empty.
     const dispatched = events.find((e) => e.kind === 'dispatch');
@@ -577,6 +584,7 @@
         if (seatIndex >= 0) await flyIntoSeat(evt.bay, seatIndex, passenger, pace);
         else { app.queueAt++; renderQueue(); }
       } else if (evt.kind === 'depart') {
+        Sfx.play('depart');
         await sleep(120);
         await departBay(evt.bay);
       }
@@ -606,6 +614,8 @@
   }
 
   function offerRewind(reason) {
+    // A hand on the shoulder, not an alarm.
+    Sfx.play('rewind');
     showBanner(reason, [
       { label: 'Zug zurücknehmen', cls: 'primary', act: undo },
       { label: 'Neu starten', act: () => loadLevel(app.level.id) },
@@ -637,6 +647,7 @@
 
   function completeLevel() {
     app.done = true;
+    Sfx.play('win');
     const s = load();
     const attempts = (s.attempts || {})[app.level.id] || 1;
     const lastPlayed = s.lastPlayed ? new Date(s.lastPlayed) : null;
@@ -655,6 +666,10 @@
   }
 
   function showPostcard(card) {
+    // From here until the player moves on, the board is quiet and the card gets
+    // one soft bell. A fanfare would turn a kind word into a payout jingle.
+    Sfx.setPostcardShowing(true);
+    Sfx.play('postcard');
     const layer = el('div', 'postcard-layer');
     const cardNode = el('div', 'postcard');
 
@@ -688,7 +703,11 @@
     layer.appendChild(cardNode);
     document.body.appendChild(layer);
 
-    function close() { layer.remove(); nextLevel(); }
+    function close() {
+      Sfx.setPostcardShowing(false);
+      layer.remove();
+      nextLevel();
+    }
   }
 
   function nextLevel() {
@@ -1022,7 +1041,11 @@
     goText.appendChild(el('span', 'go-title',
       isNew ? 'Losfahren' : `Weiter · Level ${resume}`));
     go.appendChild(goText);
-    go.addEventListener('click', () => { layer.remove(); loadLevel(resume); });
+    go.addEventListener('click', () => {
+      Sfx.play('uitap');
+      layer.remove();
+      loadLevel(resume);
+    });
     mid.appendChild(go);
 
     // --- secondary destinations ---
@@ -1035,14 +1058,25 @@
       album.length ? 'ÖFFNEN' : 'NOCH LEER',
       () => showAlbum(), album.length === 0));
 
-    const toneRow = menuRow('TON', 'Worte nach dem Sieg', toneLabel(saved.tone), null);
+    const toneRow = menuRow('WORT', 'Worte nach dem Sieg', toneLabel(saved.tone), null);
     toneRow.addEventListener('click', () => {
       const i = TONES.findIndex((t) => t[0] === (load().tone || 'warm'));
       const next = TONES[(i + 1) % TONES.length];
       save({ tone: next[0] });
       toneRow.querySelector('.row-note').textContent = next[1];
+      Sfx.play('uitap');
     });
     rows.appendChild(toneRow);
+
+    const soundRow = menuRow('TON', 'Klang', Sfx.enabled ? 'AN' : 'AUS', null);
+    soundRow.addEventListener('click', () => {
+      Sfx.enabled = !Sfx.enabled;
+      soundRow.querySelector('.row-note').textContent = Sfx.enabled ? 'AN' : 'AUS';
+      // Confirm only when switching ON. Turning sound off and hearing a click
+      // is the joke nobody finds funny.
+      if (Sfx.enabled) Sfx.play('uitap');
+    });
+    rows.appendChild(soundRow);
     mid.appendChild(rows);
     layer.appendChild(mid);
 

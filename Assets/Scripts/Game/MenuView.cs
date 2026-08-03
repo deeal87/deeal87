@@ -43,6 +43,7 @@ namespace SunnyStop.Game
         private Text _goLabel;
         private Text _goKicker;
         private Text _toneValue;
+        private Text _soundValue;
         private Text _albumNote;
         private Text _albumNo;
         private Text _mapNote;
@@ -149,8 +150,11 @@ namespace SunnyStop.Game
                                       _onAlbum, out _albumNo);
                 y -= pitch;
             }
-            _toneValue = BuildRow(back, "RowTone", "TON", "Worte nach dem Sieg", "", y,
+            _toneValue = BuildRow(back, "RowTone", "WORT", "Worte nach dem Sieg", "", y,
                                   CycleTone, out Text toneNo);
+            y -= pitch;
+            _soundValue = BuildRow(back, "RowSound", "TON", "Klang", "", y,
+                                   ToggleSound, out Text soundNo);
 
             // ---- progress ----
             RectTransform track = UiBuilder.Panel(back, "MeterTrack",
@@ -250,6 +254,7 @@ namespace SunnyStop.Game
             if (_albumNo != null) _albumNo.text = album.Count.ToString("000");
             if (_albumNote != null) _albumNote.text = album.Count > 0 ? "ÖFFNEN" : "NOCH LEER";
             _toneValue.text = ToneLabel(SaveGame.Tone);
+            _soundValue.text = AudioDirector.Enabled ? "AN" : "AUS";
 
             _legendLeft.text = $"{cleared} / 200 GELÖST";
             _legendRight.text = $"{album.Count} POSTKARTEN";
@@ -261,9 +266,19 @@ namespace SunnyStop.Game
 
         private void Play()
         {
+            AudioDirector.Play(Sound.UiTap);
             int resume = Mathf.Clamp(SaveGame.HighestLevelReached, 1, 200);
             Hide();
             if (_onPlay != null) _onPlay(resume);
+        }
+
+        private void ToggleSound()
+        {
+            AudioDirector.Enabled = !AudioDirector.Enabled;
+            _soundValue.text = AudioDirector.Enabled ? "AN" : "AUS";
+            // Play the confirmation only when switching ON. Turning sound off
+            // and hearing a click is the joke nobody finds funny.
+            if (AudioDirector.Enabled) AudioDirector.Play(Sound.UiTap);
         }
 
         private void CycleTone()
@@ -276,6 +291,7 @@ namespace SunnyStop.Game
             SaveGame.Tone = order[(i + 1) % order.Length];
             SaveGame.Flush();
             _toneValue.text = ToneLabel(SaveGame.Tone);
+            AudioDirector.Play(Sound.UiTap);
         }
 
         private static string ToneLabel(ToneSetting tone)

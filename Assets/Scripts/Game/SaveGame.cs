@@ -21,6 +21,7 @@ namespace SunnyStop.Game
         private const string KeyRecentCards = "ss.recentCards";
         private const string KeyAlbum = "ss.album";
         private const string KeyCleared = "ss.cleared";
+        private const string KeySound = "ss.sound";
         private const string KeyTone = "ss.tone";
         private const string KeyColorMode = "ss.colorMode";
         private const string KeyLastPlayed = "ss.lastPlayed";
@@ -52,6 +53,16 @@ namespace SunnyStop.Game
         {
             get => (ToneSetting)PlayerPrefs.GetInt(KeyTone, (int)ToneSetting.Warm);
             set => PlayerPrefs.SetInt(KeyTone, (int)value);
+        }
+
+        /// <summary>
+        /// Sound on or off. Defaults to ON, but see AudioDirector: the game is
+        /// fully playable silent and nothing here is gated behind hearing it.
+        /// </summary>
+        public static bool SoundOn
+        {
+            get => PlayerPrefs.GetInt(KeySound, 1) == 1;
+            set => PlayerPrefs.SetInt(KeySound, value ? 1 : 0);
         }
 
         public static Palette.Mode ColorMode

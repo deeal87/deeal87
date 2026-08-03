@@ -70,6 +70,7 @@ def build(out_path: Path) -> None:
 
     engine = (HERE / "engine.js").read_text(encoding="utf-8")
     game = (HERE / "game.js").read_text(encoding="utf-8")
+    sound = (HERE / "sound.js").read_text(encoding="utf-8")
     styles = (HERE / "styles.css").read_text(encoding="utf-8")
     shell = (HERE / "shell.html").read_text(encoding="utf-8")
 
@@ -80,6 +81,7 @@ def build(out_path: Path) -> None:
             .replace("/*STYLES*/", styles)
             .replace("/*DATA*/", f"window.SUNNY_DATA={data};")
             .replace("/*ENGINE*/", engine)
+            .replace("/*SOUND*/", sound)
             .replace("/*GAME*/", game))
 
     out_path.parent.mkdir(parents=True, exist_ok=True)

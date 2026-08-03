@@ -117,7 +117,29 @@ but it is not how you want to iterate on layout. Rebuilding menu, map, album and
 HUD as prefabs is a mechanical job; the view classes already separate *build*
 from *refresh*, so only the build half changes.
 
-### 3.5 Legacy `UnityEngine.UI.Text`
+### 3.5 Sound effects are synthesised, not recorded
+
+`SfxSynth.cs` generates all nine effects as PCM at runtime — no files, no
+licensing, nothing to download. That is not a placeholder choice, it is the
+right one for this game: the boarding sound climbs a pentatonic scale once per
+passenger and a cascade can be twelve long, so as samples it is twelve
+perfectly-tuned files that drift the moment anybody re-exports one. As
+`base * ratio[i]` it is in tune by construction.
+
+`AudioDirector.cs` is where the design actually lives — which sound on which
+event, the climbing chain, the near-silent postcard. **Keep that file even if
+you replace every waveform.** A recorded marimba would be warmer than an
+additive one, and swapping `SfxSynth.Board(i)` for twelve clips is a small
+change; the timing and note choices are the part that took thought.
+
+To audition without opening Unity, the same code renders to .wav:
+
+```bash
+mcs -out:/tmp/render.exe tools/audio/Render.cs Assets/Scripts/Game/SfxSynth.cs
+mono /tmp/render.exe /tmp/sfx      # writes nine wavs plus a full boarding chain
+```
+
+### 3.6 Legacy `UnityEngine.UI.Text`
 
 Everything uses the built-in `Text` component, not TextMeshPro, so the project
 has no package dependency beyond ugui. For a store build you almost certainly
@@ -130,10 +152,11 @@ uppercase labels in the menu need to stop looking loose.
 
 Honest list. None of this is stubbed out anywhere — it simply does not exist.
 
-- **Audio.** Nothing. No AudioSource, no mixer, no clips. CONCEPT.md §10 has the
-  brief: warm acoustic ambience per chapter, boarding notes forming a rising
-  pentatonic melody, everything duckable, fully playable silent.
-- **Haptics.** Same. The design leans on them for the silent-play case.
+- **Music and ambience.** The *effects* are done (§3.6); the warm acoustic bed
+  per chapter is not. This is the part synthesis would do badly — a generated
+  pad sounds like a generated pad — so it wants a composer or licensed loops.
+  Budget one loop per chapter, layered stems so it does not fatigue.
+- **Haptics.** Nothing. The design leans on them for the silent-play case.
 - **Art.** No models, textures or icons. `Assets/ThirdParty/LICENSES.md` is the
   file to record asset provenance in *before* you import anything.
 - **The shop.** The business model is in CONCEPT.md §8 — one non-consumable

@@ -39,6 +39,10 @@ namespace SunnyStop.Game
             SetUpLighting();
             UiBuilder.CreateEventSystem();
 
+            // Before anything that might want to make a noise.
+            var audio = new GameObject("Audio").AddComponent<AudioDirector>();
+            audio.transform.SetParent(transform, false);
+
             var board = new GameObject("BoardView").AddComponent<BoardView>();
             board.transform.SetParent(transform, false);
 

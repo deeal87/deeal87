@@ -121,6 +121,7 @@ namespace SunnyStop.Game
         private IEnumerator RefuseMove(int busId, GameState.Refusal refusal)
         {
             _busy = true;
+            AudioDirector.Play(Sound.Refused);
             yield return _board.PlayRefusal(busId);
             _busy = false;
 
@@ -134,6 +135,9 @@ namespace SunnyStop.Game
         {
             _busy = true;
             _history.Push(_state);
+            // Each move starts a fresh run up the scale, so a big cascade sounds
+            // like one - which is exactly what it is.
+            AudioDirector.ResetChain();
 
             List<TransitionEvent> events =
                 Transition.Compute(_level, _state, busId, out GameState next);
@@ -143,7 +147,9 @@ namespace SunnyStop.Game
                 switch (evt.Kind)
                 {
                     case TransitionEventKind.BusDispatched:
+                        AudioDirector.Play(Sound.Dispatch);
                         yield return _board.PlayDispatch(_level.BusById(evt.BusId), evt.BayIndex);
+                        AudioDirector.Play(Sound.Dock);
                         break;
 
                     case TransitionEventKind.PassengerBoarded:
@@ -151,6 +157,7 @@ namespace SunnyStop.Game
                         // The queue view is rebuilt from the level index, so the slot
                         // of the boarding passenger is always 0 relative to the head.
                         Passenger boarding = _level.Queue[evt.QueueIndex];
+                        AudioDirector.PlayBoarding();
                         yield return _board.PlayBoarding(
                             0, evt.BayIndex, evt.SeatsLeft,
                             evt.BusId, boarding.Seats, boarding.Color);
@@ -159,6 +166,7 @@ namespace SunnyStop.Game
                     }
 
                     case TransitionEventKind.BusDeparted:
+                        AudioDirector.Play(Sound.Depart);
                         yield return _board.PlayDeparture(evt.BusId);
                         break;
                 }
@@ -197,6 +205,9 @@ namespace SunnyStop.Game
 
         private void OfferRewind(string reason)
         {
+            // A hand on the shoulder, not an alarm: the player has just made a
+            // losing move and the game is about to offer to take it back.
+            AudioDirector.Play(Sound.Rewind);
             _hud.ShowBanner(
                 reason,
                 "Zug zurücknehmen", OnUndoRequested,
@@ -242,6 +253,7 @@ namespace SunnyStop.Game
 
         private IEnumerator CelebrateThenReward(WinContext context)
         {
+            AudioDirector.Play(Sound.Win);
             // Let the last bus finish leaving before the screen changes.
             yield return new WaitForSeconds(1.0f);
 
@@ -258,7 +270,17 @@ namespace SunnyStop.Game
 
             SaveGame.PushRecentCard(card.Id);
             SaveGame.Flush();
-            _postcard.Show(card, context.Level, AdvanceToNextLevel);
+
+            // From here until the player moves on, the board is quiet and the
+            // card gets one soft bell. See AudioDirector for why this matters
+            // more than it looks.
+            AudioDirector.SetPostcardShowing(true);
+            AudioDirector.Play(Sound.Postcard);
+            _postcard.Show(card, context.Level, () =>
+            {
+                AudioDirector.SetPostcardShowing(false);
+                AdvanceToNextLevel();
+            });
         }
 
         private void AdvanceToNextLevel()
