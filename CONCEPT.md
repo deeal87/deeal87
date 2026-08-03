@@ -70,8 +70,8 @@ Top to bottom, the screen is a tray of waiting passengers, a row of stands, and 
 │   ┌──┐  ┌──────┐   ┌──┐             │   THE LOT (grid, 7×7 → 9×10). Each
 │   │ ↑│  │  ←   │   │ ↑│             │   vehicle carries one big white
 │   └──┘  └──────┘   └──┘             │   arrow: the direction it leaves in.
-│      ┌──────┐   ┌──┐                │   A vehicle occupies 1×2 (3 seats)
-│      │  →   │   │ ↓│                │   or 1×3 cells (6 seats).
+│      ┌──────┐   ┌──┐                │   A vehicle occupies 1×2 (6 seats)
+│      │  →   │   │ ↓│                │   or 1×3 cells (12 seats).
 │      └──────┘   └──┘                │
 ├─────────────────────────────────────┤
 │  TIPP   ZURÜCK   NEU   KARTE        │   Dock.
@@ -676,8 +676,14 @@ Built and verified:
   file: start menu, board, route map, postcard album, 200 levels, 240 cards
 - **240 German postcards** across six situational categories, all three tones covered
 
-Not built: art, audio, the shop, English postcards, and — in the Unity build only — the
-route map and album screens, which exist in the browser preview.
+Not built: art, audio, the shop, English postcards and cloud save. Both builds now carry
+the same screens — menu, board, route map, postcard album, postcard.
+
+**Handing it to Unity:** `docs/UNITY_HANDOVER.md` lists what is finished, what is a
+runtime stand-in waiting for prefabs, what does not exist at all, and the constraints
+that are not obvious from the code — chiefly that the solver runs after every move, so
+any mechanic that widens the state space stalls the free rewind before it breaks
+anything else.
 
 One finding materially affects the plan: with only the three mechanics implemented so far,
 measured difficulty plateaus from about level 90 and level 200 reaches roughly half its

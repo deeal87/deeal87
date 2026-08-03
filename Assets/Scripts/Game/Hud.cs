@@ -14,6 +14,7 @@ namespace SunnyStop.Game
         public event Action HintRequested;
         public event Action UndoRequested;
         public event Action RestartRequested;
+        public event Action MenuRequested;
 
         private Text _levelLabel;
         private Text _queueLabel;
@@ -31,6 +32,16 @@ namespace SunnyStop.Game
         {
             Canvas canvas = UiBuilder.CreateCanvas("HudCanvas", sortOrder: 10);
             canvas.transform.SetParent(transform, false);
+
+            // Back to the terminal. Top-left, out of the way of the board, and
+            // the only chrome above the level number.
+            var menu = UiBuilder.TextButton(canvas.transform, "MenuButton", "\u2630",
+                                            new Color(0.88f, 0.88f, 0.86f),
+                                            new Color(0.30f, 0.28f, 0.25f),
+                                            () => MenuRequested?.Invoke());
+            UiBuilder.Place((RectTransform)menu.transform, new Vector2(0f, 1f),
+                            new Vector2(0f, 1f), new Vector2(40f, -40f),
+                            new Vector2(110f, 110f));
 
             _levelLabel = UiBuilder.Label(canvas.transform, "LevelLabel", "Level 1", 54,
                                           new Color(0.22f, 0.20f, 0.18f));

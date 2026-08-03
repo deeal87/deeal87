@@ -489,4 +489,59 @@ namespace SunnyStop.Tests
             Palette.ColorMode = Palette.Mode.Default;
         }
     }
+
+    /// <summary>
+    /// The album's storage format changed once, from a bare card id to
+    /// "id|level|ticks". Both shapes must keep loading: a returning player who
+    /// loses their kept postcards to a storage change loses the only thing in
+    /// this game worth collecting.
+    /// </summary>
+    public class AlbumStorageTests
+    {
+        [Test]
+        public void ReadsTheCurrentFormat()
+        {
+            var when = new System.DateTime(2026, 8, 2);
+            List<SaveGame.KeptCard> cards = SaveGame.ParseKept(
+                new[] { "rec_01|12|" + when.Ticks });
+
+            Assert.AreEqual(1, cards.Count);
+            Assert.AreEqual("rec_01", cards[0].Id);
+            Assert.AreEqual(12, cards[0].Level);
+            Assert.IsTrue(cards[0].HasWhen);
+            Assert.AreEqual(when, cards[0].When);
+        }
+
+        [Test]
+        public void ReadsLegacyBareIdsWithoutLosingThem()
+        {
+            List<SaveGame.KeptCard> cards = SaveGame.ParseKept(new[] { "rec_01", "ply_07" });
+
+            Assert.AreEqual(2, cards.Count, "a legacy album must not be dropped");
+            Assert.AreEqual("rec_01", cards[0].Id);
+            Assert.AreEqual(0, cards[0].Level);
+            Assert.IsFalse(cards[0].HasWhen, "no date is known for a legacy entry");
+        }
+
+        [Test]
+        public void SurvivesCorruptedEntries()
+        {
+            // Anything can end up in PlayerPrefs; none of it may throw.
+            List<SaveGame.KeptCard> cards = SaveGame.ParseKept(
+                new[] { "", "rec_01|notanumber|alsonot", "rec_02|3|99999999999999999999" });
+
+            Assert.AreEqual(2, cards.Count, "empty entries are skipped, real ones survive");
+            Assert.AreEqual(0, cards[0].Level);
+            Assert.IsFalse(cards[0].HasWhen);
+            Assert.AreEqual(3, cards[1].Level);
+            Assert.IsFalse(cards[1].HasWhen, "an out-of-range tick count is not a date");
+        }
+
+        [Test]
+        public void HandlesNothingAtAll()
+        {
+            Assert.AreEqual(0, SaveGame.ParseKept(null).Count);
+            Assert.AreEqual(0, SaveGame.ParseKept(new string[0]).Count);
+        }
+    }
 }

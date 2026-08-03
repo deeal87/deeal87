@@ -68,12 +68,27 @@ namespace SunnyStop.Core
         public IReadOnlyList<Postcard> All { get; }
 
         private readonly Random _random;
+        private readonly Dictionary<string, Postcard> _byId;
 
         public MessageBook(string locale, IReadOnlyList<Postcard> cards, int seed = 0)
         {
             Locale = locale;
             All = cards;
             _random = seed == 0 ? new Random() : new Random(seed);
+            _byId = new Dictionary<string, Postcard>(cards.Count);
+            foreach (Postcard card in cards) _byId[card.Id] = card;
+        }
+
+        /// <summary>
+        /// Looks a card up by id, for the album. Returns null for an id this
+        /// book does not have - which happens legitimately when a player's album
+        /// was filled in one language and the game is now running in another.
+        /// </summary>
+        public Postcard ById(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            Postcard card;
+            return _byId.TryGetValue(id, out card) ? card : null;
         }
 
         public static MessageBook FromJson(string json, int seed = 0)

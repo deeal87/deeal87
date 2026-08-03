@@ -77,13 +77,80 @@ namespace SunnyStop.Game
             PlayerPrefs.SetString(KeyRecentCards, string.Join(",", recent));
         }
 
+        /// <summary>
+        /// One kept postcard: which card, and where and when it was earned.
+        ///
+        /// The level matters because <see cref="Postcard.Level"/> is the card's
+        /// own milestone binding (0 for most cards), not the level the player
+        /// was on. Captioning the album from that would label almost every card
+        /// with nothing.
+        /// </summary>
+        public readonly struct KeptCard
+        {
+            public readonly string Id;
+            public readonly int Level;
+            public readonly DateTime When;
+
+            public KeptCard(string id, int level, DateTime when)
+            {
+                Id = id;
+                Level = level;
+                When = when;
+            }
+
+            public bool HasWhen => When != default(DateTime);
+        }
+
+        /// <summary>Raw entries. Prefer <see cref="KeptCards"/>.</summary>
         public static List<string> Album() => Split(PlayerPrefs.GetString(KeyAlbum, ""));
 
-        public static void KeepCard(string id)
+        /// <summary>
+        /// Kept cards, oldest first. Entries are "id|level|ticks"; a bare "id"
+        /// is an older save and still loads, because a returning player must
+        /// not lose their album to a storage change.
+        /// </summary>
+        public static List<KeptCard> KeptCards() => ParseKept(Album());
+
+        /// <summary>
+        /// Pure parse, separated from PlayerPrefs so it can be tested. This is
+        /// the code path that silently eats a returning player's album if it
+        /// ever regresses, which is worth a test rather than a hope.
+        /// </summary>
+        public static List<KeptCard> ParseKept(IEnumerable<string> rawEntries)
+        {
+            var cards = new List<KeptCard>();
+            if (rawEntries == null) return cards;
+
+            foreach (string raw in rawEntries)
+            {
+                if (string.IsNullOrEmpty(raw)) continue;
+                string[] parts = raw.Split('|');
+                int level = 0;
+                DateTime when = default(DateTime);
+                if (parts.Length > 1) int.TryParse(parts[1], out level);
+                if (parts.Length > 2)
+                {
+                    long ticks;
+                    if (long.TryParse(parts[2], out ticks)
+                        && ticks >= DateTime.MinValue.Ticks
+                        && ticks <= DateTime.MaxValue.Ticks)
+                    {
+                        when = new DateTime(ticks);
+                    }
+                }
+                cards.Add(new KeptCard(parts[0], level, when));
+            }
+            return cards;
+        }
+
+        public static void KeepCard(string id, int level)
         {
             List<string> album = Album();
-            if (album.Contains(id)) return;
-            album.Add(id);
+            foreach (string raw in album)
+            {
+                if (raw.Split('|')[0] == id) return;
+            }
+            album.Add($"{id}|{level}|{DateTime.Now.Ticks}");
             PlayerPrefs.SetString(KeyAlbum, string.Join(",", album));
         }
 
@@ -115,6 +182,9 @@ namespace SunnyStop.Game
         public static List<string> ClearedLevels() => Split(PlayerPrefs.GetString(KeyCleared, ""));
 
         public static int ClearedCount() => ClearedLevels().Count;
+
+        public static bool IsCleared(int level) =>
+            ClearedLevels().Contains(level.ToString());
 
         public static void MarkCleared(int level)
         {

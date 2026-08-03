@@ -100,5 +100,8 @@ steadily longer to reveal itself (4 moves → 14).
 Every bus on every board is part of the solution, enforced per colour by
 `validate_level`: no level can be won with a bus still parked in the lot.
 
-Not built yet: art, audio, the shop, English postcards, and — in the Unity build
-only — the route map and album screens.
+Not built yet: art, audio, the shop, English postcards, cloud save.
+
+**Finishing it in Unity:** [`docs/UNITY_HANDOVER.md`](docs/UNITY_HANDOVER.md) —
+what is done, what is a runtime stand-in waiting for prefabs, what does not
+exist, and the traps that only somebody who built it would know about.

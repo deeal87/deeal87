@@ -55,13 +55,23 @@ namespace SunnyStop.Game
             // instant rather than a second load screen.
             flow.StartFromSave();
 
+            var map = new GameObject("Map").AddComponent<MapView>();
+            map.transform.SetParent(transform, false);
+
+            var album = new GameObject("Album").AddComponent<AlbumView>();
+            album.transform.SetParent(transform, false);
+
             var menu = new GameObject("Menu").AddComponent<MenuView>();
             menu.transform.SetParent(transform, false);
-            // The route map and the album screens are not built in the Unity
-            // prototype yet. Passing null omits those rows entirely rather than
-            // shipping buttons that go nowhere; the browser build has both, and
-            // they land here when the screens do.
-            menu.Initialise(onPlay: flow.LoadLevel, onMap: null, onAlbum: null);
+
+            map.Initialise(onPick: flow.LoadLevel, onClose: menu.Show);
+            album.Initialise(ContentLoader.Messages(), onClose: menu.Show);
+            menu.Initialise(
+                onPlay: flow.LoadLevel,
+                onMap: () => { menu.Hide(); map.Show(flow.AvailableLevels, flow.CurrentLevel); },
+                onAlbum: () => { menu.Hide(); album.Show(); });
+
+            flow.MenuRequested += menu.Show;
             menu.Show();
         }
 

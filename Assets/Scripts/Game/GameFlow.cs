@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using SunnyStop.Core;
@@ -32,6 +33,14 @@ namespace SunnyStop.Game
         private bool _busy;
         private bool _levelComplete;
 
+        /// <summary>Raised when the player asks for the start menu.</summary>
+        public event Action MenuRequested;
+
+        /// <summary>Level numbers that actually shipped, ascending.</summary>
+        public IReadOnlyList<int> AvailableLevels => _available;
+
+        public int CurrentLevel => _levelNumber;
+
         public void Initialise(BoardView board, Hud hud, PostcardView postcard)
         {
             _board = board;
@@ -41,6 +50,7 @@ namespace SunnyStop.Game
             _hud.HintRequested += OnHintRequested;
             _hud.UndoRequested += OnUndoRequested;
             _hud.RestartRequested += () => LoadLevel(_levelNumber);
+            _hud.MenuRequested += () => MenuRequested?.Invoke();
             _board.BusTapped += OnBusTapped;
 
             _available = ContentLoader.AvailableLevels();

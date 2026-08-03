@@ -37,7 +37,10 @@ namespace UnityEngine
         public Vector2(float x, float y) { this.x = x; this.y = y; }
         public static Vector2 zero => new Vector2(0, 0);
         public static Vector2 one => new Vector2(1, 1);
+        public float magnitude => 0f;
         public static Vector2 operator *(Vector2 a, float b) => new Vector2(a.x * b, a.y * b);
+        public static Vector2 operator +(Vector2 a, Vector2 b) => new Vector2(a.x + b.x, a.y + b.y);
+        public static Vector2 operator -(Vector2 a, Vector2 b) => new Vector2(a.x - b.x, a.y - b.y);
     }
 
     public struct Vector3
@@ -88,6 +91,10 @@ namespace UnityEngine
         public static int Clamp(int v, int lo, int hi) => v;
         public static float Max(float a, float b) => a;
         public static int Max(int a, int b) => a;
+        public static float Abs(float f) => f;
+        public static int Abs(int v) => v;
+        public static float Atan2(float y, float x) => 0f;
+        public const float Rad2Deg = 57.29578f;
         public static float Min(float a, float b) => a;
         public static int Min(int a, int b) => a;
         public static int CeilToInt(float f) => 0;
@@ -105,6 +112,8 @@ namespace UnityEngine
         public void SetParent(Transform p) { }
         public Vector3 InverseTransformPoint(Vector3 position) => position;
         public Vector3 TransformPoint(Vector3 position) => position;
+        public int childCount { get; }
+        public Transform GetChild(int index) => null;
         public IEnumerator GetEnumerator() => null;
     }
 
@@ -309,7 +318,27 @@ namespace UnityEngine
         }
 
         public class MaskableGraphic : Graphic { }
-        public class Image : MaskableGraphic { }
+        public class Image : MaskableGraphic
+        {
+            public bool raycastTarget { get; set; }
+        }
+
+        /// <summary>Clips children to this rect without a stencil buffer.</summary>
+        public class RectMask2D : UnityEngine.EventSystems.UIBehaviour { }
+
+        public class ScrollRect : UnityEngine.EventSystems.UIBehaviour
+        {
+            public enum MovementType { Unrestricted, Elastic, Clamped }
+            public RectTransform content { get; set; }
+            public RectTransform viewport { get; set; }
+            public bool horizontal { get; set; }
+            public bool vertical { get; set; }
+            public MovementType movementType { get; set; }
+            public float elasticity { get; set; }
+            public float scrollSensitivity { get; set; }
+            public Vector2 normalizedPosition { get; set; }
+            public float verticalNormalizedPosition { get; set; }
+        }
 
         public class Text : MaskableGraphic
         {

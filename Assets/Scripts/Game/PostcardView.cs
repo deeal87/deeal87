@@ -28,6 +28,7 @@ namespace SunnyStop.Game
         private CanvasGroup _group;
 
         private Postcard _current;
+        private int _currentLevel;
         private Action _onContinue;
         private bool _kept;
 
@@ -94,6 +95,7 @@ namespace SunnyStop.Game
         public void Show(Postcard card, int level, Action onContinue)
         {
             _current = card;
+            _currentLevel = level;
             _onContinue = onContinue;
             _kept = false;
 
@@ -126,7 +128,7 @@ namespace SunnyStop.Game
         private void Keep()
         {
             if (_current == null || _kept) return;
-            SaveGame.KeepCard(_current.Id);
+            SaveGame.KeepCard(_current.Id, _currentLevel);
             SaveGame.Flush();
             _kept = true;
             _keepLabel.text = "Im Album ✓";

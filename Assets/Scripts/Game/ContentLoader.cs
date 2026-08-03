@@ -20,6 +20,7 @@ namespace SunnyStop.Game
         private static readonly Dictionary<int, LevelDefinition> LevelCache =
             new Dictionary<int, LevelDefinition>();
         private static MessageBook _messageBook;
+        private static string _messageLocale;
 
         /// <summary>Level numbers present in the build, ascending.</summary>
         public static List<int> AvailableLevels()
@@ -57,7 +58,11 @@ namespace SunnyStop.Game
 
         public static MessageBook Messages(string locale = "de")
         {
-            if (_messageBook != null) return _messageBook;
+            // Keyed on the locale, not just "already loaded once". Caching the
+            // first book unconditionally means a language switch silently keeps
+            // serving the old one - which would look like the setting doing
+            // nothing, and is exactly the kind of bug that survives to release.
+            if (_messageBook != null && _messageLocale == locale) return _messageBook;
 
             var asset = Resources.Load<TextAsset>(MessagePath + locale);
             if (asset == null && locale != "de") asset = Resources.Load<TextAsset>(MessagePath + "de");
@@ -68,6 +73,7 @@ namespace SunnyStop.Game
             }
 
             _messageBook = MessageBook.FromJson(asset.text);
+            _messageLocale = locale;
             return _messageBook;
         }
     }

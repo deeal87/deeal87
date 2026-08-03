@@ -110,6 +110,42 @@ namespace SunnyStop.Game
             return button;
         }
 
+        /// <summary>
+        /// A vertical scroll area. Returns the content rect to fill; it is
+        /// top-anchored with a pivot at the top, so callers position children
+        /// downwards from 0 and then set content.sizeDelta.y to the total.
+        /// </summary>
+        public static RectTransform ScrollArea(Transform parent, string name,
+                                               out ScrollRect scroll)
+        {
+            RectTransform viewport = Panel(parent, name, new Color(0f, 0f, 0f, 0f));
+            Stretch(viewport);
+            // RectMask2D rather than Mask: no stencil buffer, and it does not
+            // need a Graphic to clip against, which keeps the viewport invisible.
+            viewport.gameObject.AddComponent<RectMask2D>();
+            Image backdrop = viewport.GetComponent<Image>();
+            if (backdrop != null) backdrop.raycastTarget = true;
+
+            var contentGo = new GameObject("Content", typeof(RectTransform));
+            contentGo.transform.SetParent(viewport, false);
+            var content = (RectTransform)contentGo.transform;
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = new Vector2(1f, 1f);
+            content.pivot = new Vector2(0.5f, 1f);
+            content.offsetMin = new Vector2(0f, 0f);
+            content.offsetMax = new Vector2(0f, 0f);
+
+            scroll = viewport.gameObject.AddComponent<ScrollRect>();
+            scroll.content = content;
+            scroll.viewport = viewport;
+            scroll.horizontal = false;
+            scroll.vertical = true;
+            scroll.movementType = ScrollRect.MovementType.Elastic;
+            scroll.elasticity = 0.1f;
+            scroll.scrollSensitivity = 40f;
+            return content;
+        }
+
         public static void Stretch(RectTransform rect, float margin = 0f)
         {
             rect.anchorMin = Vector2.zero;

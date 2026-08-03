@@ -1,5 +1,9 @@
 # Running the prototype
 
+> Taking this to a store build? Read **[UNITY_HANDOVER.md](UNITY_HANDOVER.md)**
+> instead — what is finished, what is a deliberate stand-in, what is not
+> started, and the file and line to change for each.
+
 ## The one command that checks everything
 
 ```bash
